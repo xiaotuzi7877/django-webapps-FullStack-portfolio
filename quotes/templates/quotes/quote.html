@@ -1,0 +1,12 @@
+{% extends 'quotes/base.html' %}
+{% load static %}
+
+{% block title %}Ayrton Senna Quote{% endblock %}
+
+{% block content %}
+    <div class="quote-box">
+        <h1>Ayrton Senna Quote of the Day</h1>
+        <p><strong>"{{ quote }}"</strong></p>
+        <img src="{% static image_url %}" alt="Ayrton Senna" width="400px">
+    </div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'quotes/base.html' %}
+{% load static %}
+
+{% block title %}All Ayrton Senna Quotes{% endblock %}
+
+{% block content %}
+    <h1>All Ayrton Senna Quotes</h1>
+
+    <div class="quotes-container">
+        {% for quote in quotes %}
+            <div class="quote-card">
+                "{{ quote }}"
+            </div>
+        {% endfor %}
+    </div>    
+
+    <h2>All Images</h2>
+    <div class="image-gallery">
+        {% for image in images %}
+            <img src="{% static image %}" alt="Ayrton Senna">
+        {% endfor %}
+    </div>
+
+{% endblock %}

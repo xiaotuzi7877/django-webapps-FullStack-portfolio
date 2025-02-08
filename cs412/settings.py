@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-dsenwf=j2b)su794b&vn#_+lc7-@xy^al%w17jc@qgvsxfc@gd
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["cs-webapps.bu.edu"]
+ALLOWED_HOSTS = ["cs-webapps.bu.edu", "127.0.0.1", "localhost"]
+
 
 
 # Application definition
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'quotes',
 ]
 
 MIDDLEWARE = [
@@ -106,7 +108,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/New_York'  # Or 'Asia/Shanghai' if you're in China
+USE_TZ = True  # Ensure it's enabled
 
 USE_I18N = True
 
@@ -138,3 +141,11 @@ if socket.gethostname() == CS_DEPLOYMENT_HOSTNAME:
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # Global static directory
+    os.path.join(BASE_DIR, 'quotes/static/quotes')  # Quotes app static directory
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
