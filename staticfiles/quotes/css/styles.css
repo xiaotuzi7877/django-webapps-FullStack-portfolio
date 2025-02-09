@@ -1,0 +1,145 @@
+/* General Reset */
+body {
+    font-family: "Arial", sans-serif;
+    background-color: #009B3A !important; /* Brazil Green */
+    color: #002776 !important; /* Brazil Blue for readability */
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+/* Header */
+h1 {
+    color: #002776 !important; /* Brazil Blue */
+    font-size: 36px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    margin-top: 20px;
+}
+
+/* Navigation Links */
+nav {
+    background-color: #002776 !important; /* Brazil Blue */
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+nav a {
+    color: white !important; /* White text for contrast */
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 8px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+nav a:hover {
+    background-color: #FFCC00 !important; /* Brazil Yellow for hover effect */
+    color: #002776 !important; /* Dark text for contrast */
+}
+
+
+/* Ensuring text section background works */
+.container {
+    background-color: #FFCC00 !important; /* Brazil Yellow */
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 39, 118, 0.3); /* Brazil Blue shadow */
+    display: inline-block;
+    width: 80%;
+}
+
+/* Images */
+img {
+    max-width: 80%;
+    border-radius: 10px;
+    border: 3px solid #002776 !important; /* Brazil Blue */
+    margin-top: 15px;
+}
+
+/* Image Gallery Styling */
+.image-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;  /* Space between images */
+    justify-items: center; /* Center images */
+    align-items: center;
+    padding: 20px;
+}
+
+/* Styling for images */
+.image-gallery img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    border: 3px solid #FFCC00; /* Brazil Yellow Border */
+    box-shadow: 0px 4px 10px rgba(0, 39, 118, 0.4); /* Brazil Blue shadow */
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Hover effect */
+.image-gallery img:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 6px 12px rgba(0, 39, 118, 0.6);
+}
+
+/* Footer */
+footer {
+    margin-top: 40px;
+    padding: 10px;
+    background-color: #002776 !important; /* Brazil Blue */
+    color: white !important;
+    font-size: 14px;
+}
+
+/* Quote Section */
+
+/* General Reset */
+body {
+    font-family: "Arial", sans-serif;
+    background-color: #009B3A !important; /* Brazil Green */
+    color: #002776 !important; /* Brazil Blue for readability */
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+/* Quote Section Background */
+.quote-box {
+    background-color: #FFCC00 !important; /* Brazil Yellow */
+    color: #002776 !important; /* Brazil Blue */
+    padding: 20px;
+    border-radius: 15px;
+    display: inline-block;
+    width: 70%;
+    margin-top: 20px;
+    box-shadow: 0 4px 8px rgba(0, 39, 118, 0.3); /* Brazil Blue shadow */
+}
+
+/* Individual Quote Styling */
+.quote-card {
+    background-color: #007F33; /* Darker Brazilian Green */
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 10px auto;
+    width: 90%;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    font-style: italic;
+}
+
+/* Ensuring proper alignment */
+.quotes-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Remove default list styles */
+.quotes-container p {
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 18px;
+}
