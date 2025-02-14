@@ -21,6 +21,6 @@ from django.urls import include, path
 urlpatterns = [
     path('admin/', admin.site.urls),
     # For any request to the root URL (/), look for more URL patterns inside quotes/urls.py.
-    path('', include('quotes.urls')),
+    path('quotes/', include('quotes.urls')),
     path('restaurant/', include('restaurant.urls')),
 ]
