@@ -1,0 +1,24 @@
+{% extends "restaurant/base.html" %}
+{% load static %}
+{% block content %}
+
+<h1>Welcome to Ley Tea!</h1>
+
+<p>Our story began in 2002 in an alley called Suzhou Center. At that time, milk tea shops often used low-quality ingredients. This was frustrating for Neo, who was 19 years old and drinking "milk tea" that was made with nondairy powder and tea powder instead of fresh milk and real tea. Thinking differently, Neo created the first-ever Cheese Tea in his own kitchen. By softening the overpowering tea taste with a layer of fine cheese foam made with real milk, it created a sweet aftertaste that perfectly catered to the young crowd, marking the start of a new era of tea.</p>
+
+<img src="{% static 'restaurant/images/leytea_store.jpg' %}" alt="Hey Tea Store" class="natural-image">
+
+<p><strong>Location:</strong> 140 Bab State Street, Boston, MA</p>
+
+<p><strong>Hours:</strong></p>
+<ul>
+    <li>Monday - Friday: 10 AM - 9 PM</li>
+    <li>Saturday - Sunday: 11 AM - 10 PM</li>
+</ul>
+
+<!-- Order Button -->
+<p><a href="{% url 'order' %}"><button>Order Now</button></a></p>
+
+{% endblock %}
+
+

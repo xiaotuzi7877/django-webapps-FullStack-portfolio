@@ -1,0 +1,82 @@
+{% extends "restaurant/base.html" %}
+{% block content %}
+
+<h1>Place Your Order</h1>
+
+<div class="order-container">  <!-- Wrap everything inside this box -->
+    <form action="{% url 'confirmation' %}" method="POST">
+        {% csrf_token %}
+
+        <h2>Select Your Items:</h2>
+        <div class="checkbox-container">
+            <label class="checkbox-option">
+                <input type="checkbox" name="items" value="Cloud Matcha Latte"> Cloud Matcha Latte ($7.99)
+            </label>
+            <label class="checkbox-option">
+                <input type="checkbox" name="items" value="Brown Sugar Boba"> Brown Sugar Boba ($7.99)
+            </label>
+            <label class="checkbox-option">
+                <input type="checkbox" name="items" value="Coco Water Matcha"> Coco Water Matcha ($7.99)
+            </label>
+            <label class="checkbox-option">
+                <input type="checkbox" name="items" value="Coco Water Jasmine"> Coco Water Jasmine ($7.99)
+            </label>
+            <label class="checkbox-option">
+                <input type="checkbox" name="items" value="Match Bobo shake"> Match Bobo shake ($7.99)
+            </label>
+            <label class="checkbox-option">
+                <input type="checkbox" name="items" value="Hot Supreme Matcha Latte"> Hot Supreme Matcha Latte ($8.99)
+            </label>
+            <label class="checkbox-option">
+                <input type="checkbox" name="items" value="Hot Matcha Jasmine Latte"> Hot Matcha Jasmine Latte ($6.99)
+            </label>
+            <label class="checkbox-option">
+                <input type="checkbox" name="items" value="Fluffy Cloud Yumberry"> Fluffy Cloud Yumberry ($8.99)
+            </label>
+            <label class="checkbox-option">
+                <input type="checkbox" name="items" value="Fluffy Cloud Mango"> Fluffy Cloud Mango ($8.99)
+            </label>
+            <label class="checkbox-option">
+                <input type="checkbox" name="items" value="Fluffy CLoud Crisp Grape"> Fluffy CLoud Crisp Grape ($8.99)
+            </label>
+            <label class="checkbox-option">
+                <input type="checkbox" name="items" value="Fluffy Cloud Strawberry"> Fluffy Cloud Strawberry ($8.99)
+            </label>
+        </div>
+
+        <h2>Today's Special: {{ daily_special_random }}</h2>
+        <label class="checkbox-option">
+            <input type="checkbox" name="items" value="{{ daily_special_random }}"> {{ daily_special_random }} ($8.99)
+        </label>
+
+        <h2>Extras:</h2>
+        <div class="checkbox-container">
+            <label class="checkbox-option">
+                <input type="checkbox" name="extras" value="Boba Pearls"> Boba Pearls (+$1)
+            </label>
+            <label class="checkbox-option">
+                <input type="checkbox" name="extras" value="Grass Jelly"> Grass Jelly (+$1)
+            </label>
+        </div>
+
+        <h2>Customer Information:</h2>
+        <label>Name:</label>
+        <input type="text" name="name" required><br>
+        <label>Phone:</label>
+        <input type="tel" name="phone" required><br>
+
+        <label>Email:</label>
+        <input type="email" name="email" required><br>
+
+        <h3>Special Instructions:</h3>
+        <div class="special-instructions">
+        <textarea name="instructions" rows="4" placeholder="Any special requests?"></textarea>
+        </div>
+
+        <button type="submit">Place Order</button>
+    </form>
+</div> <!-- End of order-container -->
+
+{% endblock %}
+
+
