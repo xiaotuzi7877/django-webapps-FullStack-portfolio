@@ -22,7 +22,6 @@
             <td>
                 {% if profile.profile_image_url %}
                     <a href="{% url 'show_profile' profile.pk %}">
-                        <!-- Rectangular thumbnail -->
                         <img class="profile-image-rectangle"
                              src="{% static profile.profile_image_url %}"
                              alt="Profile Image">
@@ -31,7 +30,12 @@
                     <span>No Image</span>
                 {% endif %}
             </td>
-            <td>{{ profile.first_name }}</td>
+            <td>
+                <!-- Restored the click-through link for the first name: -->
+                <a href="{% url 'show_profile' profile.pk %}">
+                    {{ profile.first_name }}
+                </a>
+            </td>
             <td>{{ profile.last_name }}</td>
             <td>{{ profile.city }}</td>
         </tr>
