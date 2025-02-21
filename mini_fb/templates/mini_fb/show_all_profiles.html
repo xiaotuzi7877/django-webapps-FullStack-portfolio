@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}  <!-- Load static files -->
+
+{% block content %}
+<h2 class="text-center">All Profiles</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Profile Image</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>City</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for profile in profiles %}
+        <tr>
+            <td>
+                {% if profile.profile_image_url %}
+                    <a href="{% url 'show_profile' profile.pk %}">
+                        <img src="{% static profile.profile_image_url %}" alt="Profile Image" width="50" height="50">
+                    </a>
+                {% else %}
+                    <span>No Image</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'show_profile' profile.pk %}">
+                    {{ profile.first_name }}
+                </a>
+            </td>
+            <td>{{ profile.last_name }}</td>
+            <td>{{ profile.city }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

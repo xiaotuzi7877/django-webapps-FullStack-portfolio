@@ -23,4 +23,5 @@ urlpatterns = [
     # For any request to the root URL (/), look for more URL patterns inside quotes/urls.py.
     path('quotes/', include('quotes.urls')),
     path('restaurant/', include('restaurant.urls')),
+    path('mini_fb/', include('mini_fb.urls')),
 ]

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}  <!-- Load static files -->
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card mx-auto shadow-lg" style="max-width: 600px;">
+        <div class="card-header text-center bg-primary text-white">
+            <h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
+        </div>
+        <div class="card-body text-center">
+            {% if profile.profile_image_url %}
+                <img src="{% static profile.profile_image_url %}" alt="Profile Image" class="img-fluid rounded-circle mb-3" style="width: 200px; height: 200px; object-fit: cover;">
+            {% else %}
+                <p>No Profile Image Available</p>
+            {% endif %}
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>City:</strong> {{ profile.city }}</li>
+                <li class="list-group-item"><strong>Email:</strong> {{ profile.email }}</li>
+            </ul>
+        </div>
+        <div class="card-footer text-center">
+            <a href="{% url 'show_all_profiles' %}" class="btn btn-secondary">Back to Profiles</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
