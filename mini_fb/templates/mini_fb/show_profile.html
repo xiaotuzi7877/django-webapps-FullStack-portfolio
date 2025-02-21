@@ -1,3 +1,9 @@
+<!-- 
+File: show_profile.html
+Author: Li Ziyang (miclilzy@bu.edu), 02/21/2025
+Description: This template displays an individual user's profile, 
+showing their name, city, email, and profile image.
+-->
 {% extends "base.html" %}
 {% load static %}
 
@@ -8,7 +14,7 @@
 {% block content %}
 <div class="container mt-5">
     <div class="card mx-auto shadow-lg" style="max-width: 600px;">
-        <!-- Example with a blue header -->
+        <!-- Card header with user's name -->
         <div class="card-header text-white text-center" style="background-color: #007bff;">
             <h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
         </div>
@@ -21,6 +27,7 @@
             {% else %}
                 <p>No Image Provided</p>
             {% endif %}
+            <!-- Display user details -->          
             <ul class="list-group list-group-flush mt-3">
                 <li class="list-group-item">
                     <strong>City:</strong> {{ profile.city }}
@@ -30,6 +37,8 @@
                 </li>
             </ul>
         </div>
+        
+        <!-- Back button to return to all profiles -->
         <div class="card-footer text-center">
             <a href="{% url 'show_all_profiles' %}" class="button">Back to Profiles</a>
         </div>

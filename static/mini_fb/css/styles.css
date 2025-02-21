@@ -1,3 +1,10 @@
+/* 
+File: styles.css
+Author: Li Ziyang (miclilzy@bu.edu), 02/21/2025
+Description: This stylesheet defines the styles for the Mini Facebook web application, 
+including layout, navigation, tables, cards, and profile image styles.
+*/
+
 /* Optional Reset */
 * {
     margin: 0;
