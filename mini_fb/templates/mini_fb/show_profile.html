@@ -1,28 +1,38 @@
 {% extends "base.html" %}
-{% load static %}  <!-- Load static files -->
+{% load static %}
+
+{% block nav %}
+<!-- Overriding nav with nothing to remove the top bar -->
+{% endblock nav %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="card mx-auto shadow-lg" style="max-width: 600px;">
-        <div class="card-header text-center bg-primary text-white">
+        <!-- Blue header just as an example -->
+        <div class="card-header text-white text-center" style="background-color: #007bff;">
             <h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
         </div>
         <div class="card-body text-center">
             {% if profile.profile_image_url %}
-                <img src="{% static profile.profile_image_url %}" alt="Profile Image" class="img-fluid rounded-circle mb-3" style="width: 200px; height: 200px; object-fit: cover;">
+                <!-- Circular image -->
+                <img class="profile-image-circle"
+                     src="{% static profile.profile_image_url %}"
+                     alt="Profile Image">
             {% else %}
-                <p>No Profile Image Available</p>
+                <p>No Image Provided</p>
             {% endif %}
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item"><strong>City:</strong> {{ profile.city }}</li>
-                <li class="list-group-item"><strong>Email:</strong> {{ profile.email }}</li>
+            <ul class="list-group list-group-flush mt-3">
+                <li class="list-group-item">
+                    <strong>City:</strong> {{ profile.city }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Email:</strong> {{ profile.email }}
+                </li>
             </ul>
         </div>
         <div class="card-footer text-center">
-            <a href="{% url 'show_all_profiles' %}" class="btn btn-secondary">Back to Profiles</a>
+            <a href="{% url 'show_all_profiles' %}" class="button">Back to Profiles</a>
         </div>
     </div>
 </div>
-{% endblock %}
-
-
+{% endblock content %}

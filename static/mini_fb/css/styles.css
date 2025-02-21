@@ -1,0 +1,151 @@
+/* Optional Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* General Page Layout */
+body {
+    background-color: #E0E0E0;  /* Light Gray background */
+    font-family: 'Arial', sans-serif;
+    color: #000;               /* Black text throughout */
+}
+
+/* Header */
+.custom-header {
+    background-color: #FF0000; /* Bold red header */
+    color: #fff;               /* White text for contrast */
+    text-align: center;
+    padding: 15px 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #f8f8f8; /* Light gray navbar background */
+}
+
+.navbar-brand,
+.nav-link {
+    color: #000 !important;    /* Black text for navbar links */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Hover effect on Navbar links (Home, Profiles) */
+.navbar-brand:hover,
+.nav-link:hover {
+    background-color: #FF0000; /* Red background on hover */
+    color: #fff !important;    /* White text on hover */
+    border-radius: 4px;
+}
+
+/* Main Container */
+.container {
+    margin-top: 20px;
+}
+
+/* Table Styles */
+table.table-striped thead th {
+    background-color: #FF0000; /* Red table header */
+    color: #fff;               /* White text in header cells */
+    text-align: center;
+}
+
+table.table-striped tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Light row striping */
+}
+
+table.table-striped td {
+    color: #000;               /* Ensure black text in table cells */
+    text-align: center;
+    padding: 10px;
+}
+
+/* Profile Image Hover Effect */
+.profile-image {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-image:hover {
+    transform: scale(1.05);    /* Slight zoom on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow */
+}
+
+/* Profile Name Hover Effect */
+.profile-link {
+    color: #000;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.profile-link:hover {
+    color: #FF0000;            /* Turn text red on hover */
+}
+
+/* Card Styles (Profile Details) */
+.card {
+    background-color: #fff;    /* White card background */
+    color: #000;               /* Black text */
+    border: none;
+    border-radius: 5px;
+}
+
+.card-header {
+    background-color: #FF0000; /* Red card header */
+    color: #fff;               /* White text */
+    font-size: 20px;
+    text-align: center;
+}
+
+.card-footer {
+    background-color: #f0f0f0; /* Light gray footer */
+    text-align: center;
+}
+
+/* Buttons (e.g. "Back to Profiles") */
+.button {
+    background-color: #fff;    /* White background */
+    color: #FF0000;            /* Red text */
+    padding: 10px 15px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    border: 2px solid #FF0000;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #FF0000; /* Red on hover */
+    color: #fff;               /* White text on hover */
+}
+
+/* Footer */
+footer {
+    background-color: #333;    /* Dark gray footer */
+    color: #fff;               /* White text */
+    text-align: center;
+    padding: 15px 0;
+    margin-top: 40px;
+}
+
+/* Circular image for the single profile page */
+.profile-image-circle {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;  /* Makes the image circular */
+    object-fit: cover;   /* Ensures the image fills the circle without distortion */
+    display: block;
+    margin: 0 auto;      /* Center image horizontally if needed */
+}
+
+/* Thumbnail image for the all-profiles page */
+.profile-image-rectangle {
+    width: 50px;         /* Or adjust as needed */
+    height: 50px;
+    object-fit: cover;   /* Crop the image to fill the area */
+    border-radius: 4px;  /* Small rounding, optional */
+    display: block;
+    margin: 0 auto; 
+}

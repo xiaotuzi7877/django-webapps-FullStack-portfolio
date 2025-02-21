@@ -1,5 +1,9 @@
 {% extends "base.html" %}
-{% load static %}  <!-- Load static files -->
+{% load static %}
+
+{% block nav %}
+<!-- Overriding nav with nothing to remove the top bar -->
+{% endblock nav %}
 
 {% block content %}
 <h2 class="text-center">All Profiles</h2>
@@ -18,21 +22,21 @@
             <td>
                 {% if profile.profile_image_url %}
                     <a href="{% url 'show_profile' profile.pk %}">
-                        <img src="{% static profile.profile_image_url %}" alt="Profile Image" width="50" height="50">
+                        <!-- Rectangular thumbnail -->
+                        <img class="profile-image-rectangle"
+                             src="{% static profile.profile_image_url %}"
+                             alt="Profile Image">
                     </a>
                 {% else %}
                     <span>No Image</span>
                 {% endif %}
             </td>
-            <td>
-                <a href="{% url 'show_profile' profile.pk %}">
-                    {{ profile.first_name }}
-                </a>
-            </td>
+            <td>{{ profile.first_name }}</td>
             <td>{{ profile.last_name }}</td>
             <td>{{ profile.city }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-{% endblock %}
+{% endblock content %}
+
