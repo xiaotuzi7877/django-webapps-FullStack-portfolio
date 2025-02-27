@@ -21,7 +21,7 @@ showing their name, city, email, and profile image.
         <div class="card-body text-center">
             {% if profile.profile_image_url %}
                 <!-- Circular image -->
-                <img class="profile-image-circle"
+                <img class="profile-image-single"
                      src="{% static profile.profile_image_url %}"
                      alt="Profile Image">
             {% else %}

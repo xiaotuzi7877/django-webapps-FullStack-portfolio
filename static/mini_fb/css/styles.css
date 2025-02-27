@@ -77,6 +77,19 @@ body {
 }
 
 /* Profile Image */
+/* Profile Image - Square & Cropped (Single Profile Page) */
+.profile-image-single {
+    width: 250px !important; /* Force square dimensions */
+    height: 250px !important;
+    object-fit: cover !important; /* Crop image to center */
+    border-radius: 10px !important; /* Slightly rounded corners */
+    display: block !important;
+    margin: 0 auto !important; /* Center align */
+    border: 3px solid white !important;
+    max-width: 100% !important; /* Prevents scaling issues */
+    max-height: 100% !important;
+}
+
 .profile-image-grid {
     width: 140px;
     height: 140px;
