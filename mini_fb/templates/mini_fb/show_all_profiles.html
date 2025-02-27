@@ -1,46 +1,44 @@
+<!-- 
+File: show_profile.html
+Author: Li Ziyang (miclilzy@bu.edu), 02/21/2025
+Description: This template displays an overview of all users' profile, 
+showing their name, city, email, and profile image.
+-->
+
 {% extends "base.html" %}
 {% load static %}
 
 {% block nav %}
-<!-- Overriding nav with nothing to remove the top bar -->
+<!-- Removing top navbar -->
 {% endblock nav %}
 
 {% block content %}
-<h2 class="text-center">All Profiles</h2>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Profile Image</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>City</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for profile in profiles %}
-        <tr>
-            <td>
-                {% if profile.profile_image_url %}
-                    <a href="{% url 'show_profile' profile.pk %}">
-                        <img class="profile-image-rectangle"
-                             src="{% static profile.profile_image_url %}"
-                             alt="Profile Image">
-                    </a>
-                {% else %}
-                    <span>No Image</span>
-                {% endif %}
-            </td>
-            <td>
-                <!-- Restored the click-through link for the first name: -->
-                <a href="{% url 'show_profile' profile.pk %}">
-                    {{ profile.first_name }}
-                </a>
-            </td>
-            <td>{{ profile.last_name }}</td>
-            <td>{{ profile.city }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endblock content %}
+<!-- Centered MiniFacebook Title -->
+<div class="profile-header">
+    <h1 class="profile-title">MiniFacebook</h1>
+</div>
 
+<!-- Profile Grid -->
+<div class="profile-grid">
+    {% for profile in profiles %}
+    <div class="profile-card">
+        <!-- Clickable Profile Image -->
+        <a href="{% url 'show_profile' profile.pk %}">
+            {% if profile.profile_image_url %}
+                <img class="profile-image-grid"
+                     src="{% static profile.profile_image_url %}"
+                     alt="Profile Image">
+            {% else %}
+                <p>No Image</p>
+            {% endif %}
+        </a>
+        <!-- Clickable Profile Name -->
+        <p class="profile-name">
+            <a href="{% url 'show_profile' profile.pk %}" class="profile-name-link">
+                {{ profile.first_name }} {{ profile.last_name }}
+            </a>
+        </p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}

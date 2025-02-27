@@ -20,7 +20,6 @@ navigation bar, content block, and footer.
 <body>
     <!-- Header section with title -->
     <header class="custom-header text-white text-center p-3">
-        <h1>Mini Facebook</h1>
     </header>
 
     <!-- Navigation bar -->
@@ -32,8 +31,8 @@ navigation bar, content block, and footer.
         </div>
     </nav>
     {% endblock nav %}
+
     <!-- Main content section, to be overridden in child templates -->
-    <div class="container mt-4">
     <div class="container mt-4">
         {% block content %}
         {% endblock %}
@@ -45,3 +44,4 @@ navigation bar, content block, and footer.
     </footer>
 </body>
 </html>
+
