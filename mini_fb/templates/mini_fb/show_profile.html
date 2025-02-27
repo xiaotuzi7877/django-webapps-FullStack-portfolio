@@ -14,30 +14,46 @@ showing their name, city, email, and profile image.
 {% block content %}
 <div class="container mt-5">
     <div class="card mx-auto shadow-lg" style="max-width: 600px;">
+
         <!-- Card header with user's name -->
         <div class="card-header text-white text-center" style="background-color: #007bff;">
             <h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
         </div>
+
         <div class="card-body text-center">
             {% if profile.profile_image_url %}
-                <!-- Circular image -->
+                <!-- square image -->
                 <img class="profile-image-single"
                      src="{% static profile.profile_image_url %}"
                      alt="Profile Image">
             {% else %}
                 <p>No Image Provided</p>
             {% endif %}
-            <!-- Display user details -->          
-            <ul class="list-group list-group-flush mt-3">
-                <li class="list-group-item">
-                    <strong>City:</strong> {{ profile.city }}
-                </li>
-                <li class="list-group-item">
-                    <strong>Email:</strong> {{ profile.email }}
-                </li>
-            </ul>
         </div>
-        
+
+        <!-- Display user details -->          
+        <ul class="list-group list-group-flush mt-3">
+            <li class="list-group-item">
+                <strong>City:</strong> {{ profile.city }}
+            </li>
+            <li class="list-group-item">
+                <strong>Email:</strong> {{ profile.email }}
+            </li>
+        </ul>
+
+        <!-- Status Messages Section -->
+        <div class="status-message-section text-center mt-4">
+            <h4 class="status-title">Status Messages</h4>
+            {% for status in profile.get_status_messages %}
+                <div class="status-message">
+                    <p>{{ status.message }}</p>
+                    <span class="timestamp">{{ status.timestamp }}</span>
+                </div>
+            {% empty %}
+                <p class="no-status">No status messages yet.</p>
+            {% endfor %}
+        </div>
+
         <!-- Back button to return to all profiles -->
         <div class="card-footer text-center">
             <a href="{% url 'show_all_profiles' %}" class="button">Back to Profiles</a>

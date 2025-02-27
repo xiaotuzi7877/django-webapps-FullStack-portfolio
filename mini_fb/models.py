@@ -4,8 +4,7 @@
 # in the Django application, including name, city, email, and profile image URL.
 from django.db import models
 
-# Create your models here.
-from django.db import models
+
 
 class Profile(models.Model):
     # User's first name (maximum length: 50 characters)
@@ -22,3 +21,16 @@ class Profile(models.Model):
     # returns a readable representation of the profile).
     def __str__(self):
         return f"{self.first_name}{self.last_name}"
+    
+    def get_status_messages(self):
+        """ return all status messages for this profile, ordered by timestamp (newst first)"""
+        return self.statusmessage_set.all().order_by('-timestamp') 
+    
+class StatusMessage(models.Model):
+    timestamp = models.DateTimeField(auto_now_add=True)  # Automatically set the timestamp when created
+    message = models.TextField()  # The text content of the status message
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)  # Relationship to Profile
+
+    def __str__(self):
+        return f"Status by {self.profile.first_name} at {self.timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
+
