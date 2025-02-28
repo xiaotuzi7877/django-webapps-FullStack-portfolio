@@ -31,9 +31,14 @@ class CreateProfileForm(forms.ModelForm):
     last_name = forms.CharField(label="Last Name", required = True)
     city = forms.CharField(label="City", required = True)
     email = forms.EmailField(label="Email", required=True)
-    profile_image_url = forms.URLField(label="Profile Image URL", required=False)
+    profile_image_url = forms.CharField(label="Profile Image URL", required=False)
 
     class Meta:
         model = Profile
         fields = ['first_name', 'last_name', 'city', 'email', 'profile_image_url']
-       
+
+class CreateStatusMessageForm(forms.ModelForm):
+    """Form for posting a stust message"""
+    class Meta:
+        model = StatusMessage
+        fields = ['message']    

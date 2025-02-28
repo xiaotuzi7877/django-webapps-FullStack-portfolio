@@ -277,4 +277,47 @@ footer {
     border: 2px solid #FFD700;
 }
 
+/* Status Message Styles */
+/* Status Message Styles */
+.status-container {
+    margin-top: 20px;
+    text-align: center;
+    background: linear-gradient(to bottom, #b30000, #8B0000);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
 
+.status-title {
+    font-size: 20px;
+    color: #FFD700;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.status-card {
+    background: #8B0000;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    color: white;
+    text-align: left;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.status-message {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.status-timestamp {
+    font-size: 14px;
+    font-style: italic;
+    color: #FFD700;
+}
+
+/* Center the Post a Status Button */
+.status-button-container {
+    text-align: center;
+    margin-top: 15px;
+}

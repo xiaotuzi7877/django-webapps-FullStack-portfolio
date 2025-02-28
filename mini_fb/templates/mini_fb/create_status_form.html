@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container form-container">
+    <h2 class="form-title">Post a Status Message</h2>
+    <form method="POST" action="{% url 'create_status' profile.pk %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_message">Status:</label>
+            <textarea name="message" id="id_message" class="form-input" rows="3"></textarea>
+        </div>
+        <button type="submit" class="form-button">Post Message</button>
+    </form>
+</div>
+{% endblock content %}

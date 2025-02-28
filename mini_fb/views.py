@@ -7,11 +7,11 @@ including the view to create new profiles.
 Author: Li Ziyang (miclilzy@bu.edu)
 Date: 02/21/2025
 """
-from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy, reverse
 from django.views.generic.edit import CreateView
-from .models import Profile
-from .forms import CreateProfileForm
+from .models import Profile, StatusMessage
+from .forms import CreateProfileForm, CreateStatusMessageForm
 
 # Create your views here.
 from .models import Profile
@@ -75,4 +75,36 @@ class CreateProfileView(CreateView):
     model = Profile
     form_class = CreateProfileForm
     template_name = "mini_fb/create_profile_form.html"
-    success_url = reverse_lazy('show_all_profiles')  
+
+    def get_sucess_url(self):
+        """
+        redirects to the new profile page after creation
+        """  
+        return reverse("show_profile", kwargs={"pk": self.object.pk})
+
+class CreateStatusMessageView(CreateView):
+    """
+    View to create a new StatusMessage for a given Profile.
+    - Uses the `CreateStatusMessageForm`.
+    - Ensures the message is attached to the correct Profile.
+    - Redirects back to the profile page after submission.
+    """
+    model = StatusMessage
+    form_class = CreateStatusMessageForm
+    template_name = "mini_fb/create_status_form.html"
+
+    def get_context_data(self, **kwargs):
+        """Inject the profile object into the template context."""
+        context = super().get_context_data(**kwargs)
+        context['profile'] = get_object_or_404(Profile, pk=self.kwargs['pk'])
+        return context
+
+    def form_valid(self, form):
+        """Attach the correct Profile to the status message before saving."""
+        profile = get_object_or_404(Profile, pk=self.kwargs['pk'])
+        form.instance.profile = profile
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Redirect to the Profile page after successfully posting a status."""
+        return reverse('show_profile', kwargs={'pk': self.kwargs['pk']})

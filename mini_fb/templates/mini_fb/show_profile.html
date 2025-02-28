@@ -52,6 +52,11 @@ showing their name, city, email, and profile image.
             {% empty %}
                 <p class="no-status">No status messages yet.</p>
             {% endfor %}
+
+            <!-- Add a button to post a new status -->
+            <div class="text-center mt-4">
+                <a href="{% url 'create_status' profile.pk %}" class="button">Post a Status</a>
+            </div>
         </div>
 
         <!-- Back button to return to all profiles -->

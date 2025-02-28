@@ -3,6 +3,7 @@
 # Description: Defines the Profile model, which represents user profile information 
 # in the Django application, including name, city, email, and profile image URL.
 from django.db import models
+from django.urls import reverse
 
 
 
@@ -31,6 +32,18 @@ class Profile(models.Model):
         Returns the absolute URL for a profile instance, redirecting to the profile page after creation.
         """
         return reverse('show_profile', kwargs={'pk': self.pk})
+    
+    def get_status_message(self):
+        """
+        returns all status messages for this profile, ordered by timestamp.
+        """
+        return self.statusmessage_set.all().order_by('-timestamp')
+    
+    def get_absolute_url(self):
+        """
+        returns the url to view this profile
+        """
+        return reverse("show_profile", kwargs={"pk": self.pk})
     
 class StatusMessage(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)  # Automatically set the timestamp when created
