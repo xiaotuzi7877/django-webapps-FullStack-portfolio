@@ -26,6 +26,12 @@ class Profile(models.Model):
         """ return all status messages for this profile, ordered by timestamp (newst first)"""
         return self.statusmessage_set.all().order_by('-timestamp') 
     
+    def get_absolute_url(self):
+        """
+        Returns the absolute URL for a profile instance, redirecting to the profile page after creation.
+        """
+        return reverse('show_profile', kwargs={'pk': self.pk})
+    
 class StatusMessage(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)  # Automatically set the timestamp when created
     message = models.TextField()  # The text content of the status message

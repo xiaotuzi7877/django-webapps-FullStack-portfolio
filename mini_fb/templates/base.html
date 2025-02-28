@@ -22,15 +22,19 @@ navigation bar, content block, and footer.
     <header class="custom-header text-white text-center p-3">
     </header>
 
-    <!-- Navigation bar -->
-    {% block nav %}
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- Navigation bar with two buttons -->
+    <nav class="nav-container">
+        <a href="{% url 'show_all_profiles' %}" class="nav-button">All Profiles</a>
+        <a href="{% url 'create_profile' %}" class="nav-button">Create Profile</a>
+    </nav>
+
+    <!-- Add a "Create Profile" link to the top of the page -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="/">Home</a>
-            <a class="nav-link" href="/profiles/">Profiles</a>
+            <a class="navbar-brand" href="{% url 'show_all_profiles' %}"></a>
+            <a class="nav-link" href="{% url 'create_profile' %}"></a>
         </div>
     </nav>
-    {% endblock nav %}
 
     <!-- Main content section, to be overridden in child templates -->
     <div class="container mt-4">
