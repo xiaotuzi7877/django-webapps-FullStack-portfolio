@@ -321,3 +321,29 @@ footer {
     text-align: center;
     margin-top: 15px;
 }
+
+/* style Cancel button */
+.cancel-button {
+    background-color: #666;
+    color: white;
+    padding: 10px 15px;
+    font-size: 14px;
+    text-decoration: none;
+    border-radius: 5px;
+    border: 2px solid #999;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.cancel-button:hover {
+    background-color: #999;
+    color: #333;
+}
+
+/* button layout in single profile page */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Space between buttons */
+    margin-top: 20px;
+}

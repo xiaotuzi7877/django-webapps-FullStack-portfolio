@@ -9,9 +9,10 @@ Date: 02/21/2025
 """
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
 from .models import Profile, StatusMessage, Image, StatusImage
-from .forms import CreateProfileForm, CreateStatusMessageForm
+from .forms import CreateProfileForm, CreateStatusMessageForm, UpdateProfileForm
+from django.urls import reverse
 
 # Create your views here.
 from .models import Profile
@@ -142,3 +143,12 @@ class CreateStatusMessageView(CreateView):
     def get_success_url(self):
         """redirect to the profile page after positing status"""
         return reverse("show_profile", kwargs = {"pk": self.kwargs['pk']})
+
+class UpdateProfileView(UpdateView):
+    model = Profile
+    form_class = UpdateProfileForm
+    template_name = "mini_fb/update_profile_form.html"
+
+    def get_success_url(self):
+        """redirect to the updated profile page"""
+        return reverse("show_profile", kwargs={"pk": self.object.pk})

@@ -65,11 +65,12 @@ showing their name, city, email, and profile image.
                 <p class="no-status">No status messages yet.</p>
             {% endfor %}
 
-            <!-- Add a button to post a new status -->
-            <div class="text-center mt-4">
+            <!-- Buttons Container: Centered and in the same line -->
+            <div class="button-container">
                 <a href="{% url 'create_status' profile.pk %}" class="button">Post a Status</a>
+                <a href="{% url 'update_profile' profile.pk %}" class="button">Update Profile</a>
             </div>
-        </div>
+        </div> 
 
         <!-- Back button to return to all profiles -->
         <div class="card-footer text-center">
