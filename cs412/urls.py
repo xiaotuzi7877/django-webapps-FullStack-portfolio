@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.conf import settings
+from django.conf.urls.static import static
 #  allows you to connect URLs from different apps to the main urls.py
 
 urlpatterns = [
@@ -25,3 +27,7 @@ urlpatterns = [
     path('restaurant/', include('restaurant.urls')),
     path('mini_fb/', include('mini_fb.urls')),
 ]
+
+# enable media file serving in development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

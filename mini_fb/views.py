@@ -10,7 +10,7 @@ Date: 02/21/2025
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views.generic.edit import CreateView
-from .models import Profile, StatusMessage
+from .models import Profile, StatusMessage, Image, StatusImage
 from .forms import CreateProfileForm, CreateStatusMessageForm
 
 # Create your views here.
@@ -108,3 +108,37 @@ class CreateStatusMessageView(CreateView):
     def get_success_url(self):
         """Redirect to the Profile page after successfully posting a status."""
         return reverse('show_profile', kwargs={'pk': self.kwargs['pk']})
+    
+    def form_valid(self, form):
+        """Handles saving the StatusMessage and associated images."""
+        # Save the status message object
+        sm = form.save(commit=False)
+
+        # Associate with the correct profile
+        profile = get_object_or_404(Profile, pk=self.kwargs['pk'])
+        sm.profile = profile
+        sm.save()
+
+        print(f"StatusMessage created: {sm.message} (ID: {sm.id}) for Profile: {profile.first_name}")
+
+        # Process uploaded files
+        files = self.request.FILES.getlist('files')
+        print(f"Files uploaded: {files}")  # Debugging: Check if files are being received
+
+        for file in files:
+            # Create and save an Image object
+            img = Image(profile=profile, image_file=file)
+            img.save()
+            print(f"Saved Image: {img.image_file.url}")  # Debugging: Print saved image URL
+
+            # Create and save a StatusImage object
+            status_image = StatusImage(status_message=sm, image=img)
+            status_image.save()
+            print(f"Linked Image {img.image_file.url} to Status {sm.message}")
+
+        return super().form_valid(form)
+
+
+    def get_success_url(self):
+        """redirect to the profile page after positing status"""
+        return reverse("show_profile", kwargs = {"pk": self.kwargs['pk']})

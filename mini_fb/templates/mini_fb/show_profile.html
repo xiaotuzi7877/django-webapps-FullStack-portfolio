@@ -44,10 +44,22 @@ showing their name, city, email, and profile image.
         <!-- Status Messages Section -->
         <div class="status-message-section text-center mt-4">
             <h4 class="status-title">Status Messages</h4>
+
             {% for status in profile.get_status_messages %}
                 <div class="status-message">
                     <p>{{ status.message }}</p>
                     <span class="timestamp">{{ status.timestamp }}</span>
+
+                    <!-- Display images under status messages -->
+                    {% with status.statusimage_set.all as images %}
+                        {% if images %}
+                            {% for si in images %}
+                                <img src="{{ si.image.image_file.url }}" alt="{{ si.image.caption }}" width="200">
+                            {% endfor %}
+                        {% else %}
+                            <p class="no-images">No images attached to this status.</p>
+                        {% endif %}
+                    {% endwith %}
                 </div>
             {% empty %}
                 <p class="no-status">No status messages yet.</p>
