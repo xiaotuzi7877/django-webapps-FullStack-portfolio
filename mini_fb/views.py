@@ -145,6 +145,17 @@ class CreateStatusMessageView(CreateView):
         return reverse("show_profile", kwargs = {"pk": self.kwargs['pk']})
 
 class UpdateProfileView(UpdateView):
+    """
+    View to handle updating an existing Profile in the Mini Facebook application.
+
+    This class-based view inherits from Django's generic `UpdateView`, allowing users
+    to modify specific profile details, excluding first and last names.
+
+    Attributes:
+        model (Profile): The model representing user profiles.
+        form_class (UpdateProfileForm): The form used to update profile fields.
+        template_name (str): The template used to render the profile update form.
+    """
     model = Profile
     form_class = UpdateProfileForm
     template_name = "mini_fb/update_profile_form.html"
@@ -155,6 +166,18 @@ class UpdateProfileView(UpdateView):
     
 
 class DeleteStatusMessageView(DeleteView):
+    """
+    View to handle the deletion of a StatusMessage in the Mini Facebook application.
+
+    This class-based view inherits from Django's generic `DeleteView`, providing
+    a confirmation page for deleting a status message. Upon successful deletion,
+    it redirects the user back to the corresponding profile page.
+
+    Attributes:
+        model (StatusMessage): The model representing status messages.
+        template_name (str): The template used to confirm the deletion.
+        context_object_name (str): The name used to reference the status message object in the template.
+    """
     model = StatusMessage
     template_name = "mini_fb/delete_status_form.html"
     context_object_name = "status"
@@ -164,6 +187,17 @@ class DeleteStatusMessageView(DeleteView):
         return reverse("show_profile", kwargs={"pk": self.object.profile.pk})
     
 class UpdateStatusMessageView(UpdateView):
+    """
+    View to handle updating an existing StatusMessage in the Mini Facebook application.
+
+    This class-based view inherits from Django's generic `UpdateView`, allowing users
+    to edit only the message content of an existing status message.
+
+    Attributes:
+        model (StatusMessage): The model representing status messages.
+        fields (list): Specifies that only the `message` field can be updated.
+        template_name (str): The template used to render the update form.
+    """
     model = StatusMessage
     fields = ["message"]  # Only allow updating the message text
     template_name = "mini_fb/update_status_form.html"

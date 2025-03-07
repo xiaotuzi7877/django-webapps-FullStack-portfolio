@@ -1,3 +1,17 @@
+<!--
+File: update_status_form.html
+Author: Li Ziyang
+Description:
+    This template provides a form for users to update an existing status message in the Mini Facebook application.
+    Users can modify the text of their status message, while the associated profile remains unchanged.
+    
+    The form includes:
+    - A CSRF token for security.
+    - Input fields dynamically generated using Django forms.
+    - A "Save Changes" button to submit the form and update the status message.
+    - A "Cancel" button that redirects back to the profile page without saving changes.
+-->
+
 {% extends "base.html" %}
 {% load static %}
 
