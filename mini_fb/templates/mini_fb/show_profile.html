@@ -60,6 +60,12 @@ showing their name, city, email, and profile image.
                             <p class="no-images">No images attached to this status.</p>
                         {% endif %}
                     {% endwith %}
+
+                    <!-- Update & Delete Buttons -->
+                    <div class="status-actions">
+                        <a href="{% url 'update_status' status.pk %}" class="update-button">Update</a>
+                        <a href="{% url 'delete_status' status.pk %}" class="delete-button">Delete</a>
+                    </div>
                 </div>
             {% empty %}
                 <p class="no-status">No status messages yet.</p>

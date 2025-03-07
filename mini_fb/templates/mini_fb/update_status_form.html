@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container form-container">
+    <h2 class="form-title">Update Status</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        <button type="submit" class="form-button">Save Changes</button>
+        <a href="{% url 'show_profile' object.profile.pk %}" class="cancel-button">Cancel</a>
+    </form>
+</div>
+{% endblock content %}

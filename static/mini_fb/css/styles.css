@@ -347,3 +347,28 @@ footer {
     gap: 15px; /* Space between buttons */
     margin-top: 20px;
 }
+
+/* Centering the Update & Delete buttons */
+.status-actions {
+    display: flex;
+    justify-content: center; /* Center the buttons */
+    gap: 15px; /* Space between buttons */
+    margin-top: 10px;
+}
+
+.update-button, .delete-button {
+    background-color: #FFD700;
+    color: #8B0000;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 5px;
+    border: 2px solid #8B0000;
+    display: inline-block;
+}
+
+.update-button:hover, .delete-button:hover {
+    background-color: #8B0000;
+    color: #FFD700;
+}

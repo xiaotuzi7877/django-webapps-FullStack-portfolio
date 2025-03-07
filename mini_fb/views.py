@@ -9,7 +9,7 @@ Date: 02/21/2025
 """
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Profile, StatusMessage, Image, StatusImage
 from .forms import CreateProfileForm, CreateStatusMessageForm, UpdateProfileForm
 from django.urls import reverse
@@ -152,3 +152,25 @@ class UpdateProfileView(UpdateView):
     def get_success_url(self):
         """redirect to the updated profile page"""
         return reverse("show_profile", kwargs={"pk": self.object.pk})
+    
+
+class DeleteStatusMessageView(DeleteView):
+    model = StatusMessage
+    template_name = "mini_fb/delete_status_form.html"
+    context_object_name = "status"
+
+    def get_success_url(self):
+        """Redirect back to the profile page after deleting a status message."""
+        return reverse("show_profile", kwargs={"pk": self.object.profile.pk})
+    
+class UpdateStatusMessageView(UpdateView):
+    model = StatusMessage
+    fields = ["message"]  # Only allow updating the message text
+    template_name = "mini_fb/update_status_form.html"
+
+    def get_success_url(self):
+        """Redirect back to the profile page after updating a status message."""
+        if self.object.profile:  # Ensure profile exists
+            return reverse("show_profile", kwargs={"pk": self.object.profile.pk})
+        else:
+            return reverse("show_all_profiles")  # Fallback in case of error
