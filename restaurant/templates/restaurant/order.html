@@ -1,3 +1,24 @@
+<!-- 
+File: order.html
+Author: Li Ziyang (miclilzy@bu.edu), 03/18/2025
+Description: This is the order page for the Restaurant web application (Ley Tea).
+It allows customers to select menu items, choose extras, and provide their details 
+before placing an order.
+
+Features:
+- Extends `base.html` for a consistent layout.
+- Displays a list of menu items with checkboxes for selection.
+- Highlights "Today's Special" and allows users to add it to their order.
+- Provides options for extras such as boba pearls and grass jelly.
+- Includes input fields for customer details (name, phone, email).
+- Allows customers to add special instructions.
+- Uses a form submission to send order data to the confirmation page.
+
+Usage:
+This template is rendered when users visit the "Order" page.
+Users select items and submit the form, which sends data to `confirmation.html`.
+-->
+
 {% extends "restaurant/base.html" %}
 {% block content %}
 

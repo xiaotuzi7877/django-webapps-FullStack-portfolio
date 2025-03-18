@@ -1,3 +1,23 @@
+<!-- 
+File: confirmation.html
+Author: Li Ziyang (miclilzy@bu.edu), 03/18/2025
+Description: This is the order confirmation page for the Restaurant web application (Ley Tea).
+It displays the details of the customer's order, including selected menu items, extras,
+special instructions, total price, and estimated pickup time.
+
+Features:
+- Extends `base.html` for a consistent layout.
+- Displays the customer's name and a confirmation message.
+- Lists ordered items and selected extras (if any).
+- Shows special instructions (if provided).
+- Displays the total price and estimated pickup time.
+- Includes a button to return to the main page.
+
+Usage:
+This template is rendered after an order is submitted through the `order` view.
+It dynamically displays the order details passed from `views.py`.
+-->
+
 {% extends "restaurant/base.html" %}
 {% block content %}
     <div class="order-container"> <!-- White Box like Order Page -->

@@ -1,3 +1,20 @@
+<!-- 
+File: base.html
+Author: Li Ziyang (miclilzy@bu.edu), 03/18/2025
+Description: This is the base template for the Quotes web application. 
+It defines the common structure used across all pages, including the navigation menu,
+content container, and dynamic content block.
+
+Features:
+- A dynamic title block for individual page titles.
+- A responsive, styled container for displaying content.
+- A navigation menu with links to key pages (Quote of the Day, Show All, About).
+- A placeholder `{% block content %}` for child templates to override.
+
+Usage:
+Other templates extend this base template and insert their own content 
+within the `{% block content %}` section.
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>

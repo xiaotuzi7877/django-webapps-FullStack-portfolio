@@ -1,3 +1,19 @@
+/* 
+File: styles.css
+Author: Li Ziyang (miclilzy@bu.edu), 03/18/2025
+Description: This is the main stylesheet for the Restaurant web application (Ley Tea).
+It defines styles for layout, typography, navigation, and ordering pages, 
+creating a luxurious and elegant UI with a gold and dark brown color scheme.
+
+Features:
+- Uses Playfair Display font for a high-end, luxury feel.
+- Implements a golden-themed navigation bar and interactive buttons.
+- Creates structured, modern styling for order forms, checkboxes, and confirmation pages.
+- Adds hover effects and transitions for better user experience.
+- Ensures responsiveness with fluid width and flexible grids.
+*/
+
+
 /* ========================== */
 /* General Page Styling */
 /* ========================== */

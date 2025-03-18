@@ -1,3 +1,19 @@
+<!-- 
+File: quote.html
+Author: Li Ziyang (miclilzy@bu.edu), 03/18/2025
+Description: This template displays the "Quote of the Day" by Ayrton Senna.
+It dynamically loads a quote and an image using Django template variables.
+
+Features:
+- Extends `base.html` for a consistent layout.
+- Dynamically displays a quote using the `quote` variable.
+- Loads and displays an image of Ayrton Senna using a static file URL.
+
+Usage:
+This template is rendered when users visit the main quote page. 
+The `quote` variable is passed from the Django view, and `image_url` points 
+to a static image file.
+-->
 {% extends 'quotes/base.html' %}
 {% load static %}
 

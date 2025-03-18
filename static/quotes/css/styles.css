@@ -1,3 +1,19 @@
+/* 
+File: styles.css
+Author: Li Ziyang (miclilzy@bu.edu), 03/18/2025
+Description: This is the main stylesheet for the Quotes web application.
+It defines the layout, colors, typography, and styles for different sections, 
+including the navigation bar, quotes section, images, and footer.
+
+Features:
+- Uses Brazil's national colors for theme consistency.
+- Styles the navigation bar with hover effects.
+- Creates a container for quotes and images with a structured layout.
+- Adds a shadow and hover effect to images for a modern UI.
+- Ensures responsiveness with a flexible grid system.
+*/
+
+
 /* General Reset */
 body {
     font-family: "Arial", sans-serif;

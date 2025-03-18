@@ -1,3 +1,21 @@
+<!-- 
+File: base.html
+Author: Li Ziyang (miclilzy@bu.edu), 03/18/2025
+Description: This is the base template for the Restaurant web application (Ley Tea).
+It defines the common structure used across all pages, including the navigation bar, 
+content block, and footer.
+
+Features:
+- Includes a navigation bar with links to the home and order pages.
+- Provides a container `{% block content %}` for page-specific content.
+- Uses a linked CSS file (`styles.css`) for styling.
+- Includes a footer with copyright information.
+
+Usage:
+All other templates extend this base template and insert their own content 
+within the `{% block content %}` section.
+-->
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">

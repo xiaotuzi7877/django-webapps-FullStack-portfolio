@@ -1,3 +1,20 @@
+<!-- 
+File: show.html
+Author: Li Ziyang (miclilzy@bu.edu), 03/18/2025
+Description: This template displays all available Ayrton Senna quotes and images.
+It dynamically loads a list of quotes and images using Django template variables.
+
+Features:
+- Extends `base.html` for a consistent layout.
+- Displays all available quotes in a styled container.
+- Displays all available images using a gallery layout.
+- Uses Django's `{% for %}` loop to iterate over `quotes` and `images`.
+
+Usage:
+This template is rendered when users visit the "Show All" page.
+The `quotes` variable contains a list of Ayrton Senna quotes.
+The `images` variable contains paths to static image files.
+-->
 {% extends 'quotes/base.html' %}
 {% load static %}
 
