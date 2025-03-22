@@ -45,6 +45,65 @@ class Profile(models.Model):
         """
         return reverse("show_profile", kwargs={"pk": self.pk})
     
+    def get_friends(self):
+        """
+        Returns a list of Profile objects that are friends with this Profile.
+        """
+        # Retrieve all Friend instances where this profile is profile1 or profile2
+        friends = Friend.objects.filter(profile1=self) | Friend.objects.filter(profile2=self)
+
+        # Extract the Profile objects (excluding self)
+        friend_profiles = [
+            friend.profile2 if friend.profile1 == self else friend.profile1
+            for friend in friends
+        ]
+
+        return friend_profiles
+    
+    def add_friend(self, other):
+        """
+        Adds a friend relation if it does not already exist and avoids self-friending.
+        """
+        if self == other:
+            return  # Prevent self-friending
+
+        # Check if the friendship already exists
+        friendship_exists = Friend.objects.filter(
+            models.Q(profile1=self, profile2=other) | models.Q(profile1=other, profile2=self)
+        ).exists()
+
+        if not friendship_exists:
+            Friend.objects.create(profile1=self, profile2=other)
+
+    def get_friend_suggestions(self):
+        """
+        Returns a list of potential friends that the user is not yet friends with.
+        """
+        # Get all profiles except self
+        all_profiles = Profile.objects.exclude(pk=self.pk)
+
+        # Get the user's current friends
+        current_friends = self.get_friends()
+
+        # Exclude friends from the suggestion list
+        suggested_friends = all_profiles.exclude(pk__in=[friend.pk for friend in current_friends])
+
+        return suggested_friends
+    
+    def get_news_feed(self):
+        """
+        Returns a queryset of status messages from the profile and its friends, sorted by timestamp.
+        """
+        # Get the list of friends
+        friends = self.get_friends()
+
+        # Get status messages for this profile and their friends
+        status_messages = StatusMessage.objects.filter(
+            models.Q(profile=self) | models.Q(profile__in=friends)
+        ).order_by('-timestamp')  # Most recent first
+
+        return status_messages
+    
 class StatusMessage(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)  # Automatically set the timestamp when created
     message = models.TextField()  # The text content of the status message
@@ -63,3 +122,23 @@ class StatusImage(models.Model):
     status_message = models.ForeignKey(StatusMessage, on_delete = models.CASCADE)
     image = models.ForeignKey(Image, on_delete = models.CASCADE)
 
+class Friend(models.Model):
+    """
+    represents a friendship connection between 2 profiles
+    """
+    profile1 = models.ForeignKey(Profile, on_delete = models.CASCADE, related_name = "friends_profile1")
+    profile2 = models.ForeignKey(Profile, on_delete = models.CASCADE, related_name = "friends_profile2")
+    timestamp = models.DateTimeField(auto_now_add = True) # stores the time of making connections
+
+    def __str__(self):
+        """
+        String representation of friendship
+        """
+        return f"{self.profile1.first_name} {self.profile1.last_name} & {self.profile2.first_name} {self.profile2.last_name}"
+    
+    class Meta:
+        """
+        Ensure that the combination of profile1 and profile2 is unique
+        Prevents duplicate friendships like (A, B) and (A, B) from being created"
+        """
+        unique_together = ('profile1', 'profile2')

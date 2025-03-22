@@ -1,0 +1,38 @@
+<!--
+    File: friend_suggestions.html
+    Author: Li Ziyang (miclilzy@bu.edu), 02/21/2025
+    Description:
+    This template displays friend suggestions for a specific user Profile.
+    It shows suggested users (not yet friends), allowing the user to view their profile
+    or add them directly as friends. The layout and style match the overall Mini Facebook theme.
+-->
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="status-container">
+    <div class="status-title">Friend Suggestions for {{ profile.first_name }} {{ profile.last_name }}</div>
+    
+    <div class="profile-grid">
+        {% for suggested_friend in suggested_friends %}
+            <div class="profile-card">
+                <img src="{% static suggested_friend.profile_image_url %}" class="profile-image-grid" alt="{{ suggested_friend.first_name }}'s picture">
+                <a href="{% url 'show_profile' suggested_friend.pk %}" class="profile-name-link">
+                    {{ suggested_friend.first_name }} {{ suggested_friend.last_name }}
+                </a>
+                <br>
+                <a href="{% url 'add_friend' profile.pk suggested_friend.pk %}" class="button mt-2">Add Friend</a>
+            </div>
+        {% empty %}
+            <p class="no-status">No new friends to suggest right now.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Buttons -->
+    <div class="text-center mt-4">
+        <a href="{% url 'show_profile' profile.pk %}" class="button">Back to Profile</a>
+    </div>
+</div>
+{% endblock %}
+

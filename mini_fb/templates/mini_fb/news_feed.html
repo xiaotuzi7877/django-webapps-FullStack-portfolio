@@ -1,0 +1,48 @@
+<!--
+    File: news_feed.html
+    Author: Li Ziyang (miclilzy@bu.edu), 02/21/2025
+    Description:
+    This template displays the news feed for a specific Profile.
+    It shows a list of recent StatusMessages from the profile and their friends,
+    each including a profile image, name, timestamp, and message.
+-->
+    
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- News Feed Section -->
+<div class="status-container">
+    <div class="status-title">News Feed for {{ profile.first_name }} {{ profile.last_name }}</div>
+
+    <!-- Feed Cards -->
+    {% for status in news_feed %}
+        <div class="status-card text-center">
+
+            <!-- Profile Picture -->
+            <img src="{% static status.profile.profile_image_url %}"
+                 alt="{{ status.profile.first_name }}'s picture"
+                 class="profile-image-grid">
+
+            <!-- Name + Timestamp -->
+            <p class="status-message">
+                {{ status.profile.first_name }} {{ status.profile.last_name }}
+            </p>
+            <p class="status-timestamp">
+                {{ status.timestamp|date:"F j, Y, g:i a" }}
+            </p>
+
+            <!-- Message Content -->
+            <p>{{ status.message }}</p>
+        </div>
+    {% empty %}
+        <p class="no-status">No recent status updates.</p>
+    {% endfor %}
+
+    <!-- Back Button -->
+    <div class="status-button-container">
+        <a href="{% url 'show_profile' profile.pk %}" class="button">Back to Profile</a>
+    </div>
+</div>
+{% endblock %}
+

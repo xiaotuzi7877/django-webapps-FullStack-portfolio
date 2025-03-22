@@ -78,10 +78,57 @@ showing their name, city, email, and profile image.
             </div>
         </div> 
 
-        <!-- Back button to return to all profiles -->
-        <div class="card-footer text-center">
-            <a href="{% url 'show_all_profiles' %}" class="button">Back to Profiles</a>
+        <!-- Connections Section -->
+        <div class="status-container">
+            <div class="status-title">Friends</div>
+            <div class="profile-grid">
+                {% for friend in friends %}
+                    <div class="profile-card">
+                        <img src="{% static friend.profile_image_url %}" class="profile-image-grid" alt="{{ friend.first_name }}'s picture">
+                        <a href="{% url 'show_profile' friend.pk %}" class="profile-name-link">
+                            {{ friend.first_name }} {{ friend.last_name }}
+                        </a>
+                    </div>
+                {% empty %}
+                    <p class="no-status">This user has no friends yet.</p>
+                {% endfor %}
+            </div>
+
+            <hr style="margin: 30px 0; border-color: #FFD700;">
+
+            <div class="status-title">Friend Suggestions</div>
+            <div class="profile-grid">
+                {% for suggested_friend in suggested_friends %}
+                    <div class="profile-card">
+                        <img src="{% static suggested_friend.profile_image_url %}" class="profile-image-grid" alt="{{ suggested_friend.first_name }}'s picture">
+                        <a href="{% url 'show_profile' suggested_friend.pk %}" class="profile-name-link">
+                            {{ suggested_friend.first_name }} {{ suggested_friend.last_name }}
+                        </a>
+                        <br>
+                        <a href="{% url 'add_friend' profile.pk suggested_friend.pk %}" class="button mt-2">Add Friend</a>
+                    </div>
+                {% empty %}
+                    <p class="no-status">No friend suggestions available.</p>
+                {% endfor %}
+            </div>
+
+            <!-- Button row in Connections section -->
+            <div class="text-center mt-4">
+                <a href="{% url 'friend_suggestions' profile.pk %}" class="button">See Friend Suggestions</a>
+                <a href="{% url 'news_feed' profile.pk %}" class="button">News Feed</a>
+            </div>
         </div>
+
+
+
+
+                <!-- Back button to return to all profiles -->
+                <div class="card-footer text-center">
+                    <a href="{% url 'show_all_profiles' %}" class="button">Back to Profiles</a>
+                </div>
+
+                
+
     </div>
 </div>
 {% endblock content %}
