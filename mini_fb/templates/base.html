@@ -20,6 +20,16 @@ navigation bar, content block, and footer.
 <body>
     <!-- Header section with title -->
     <header class="custom-header text-white text-center p-3">
+        <!-- show authenticated user-->
+        {% if user.is_authenticated %}
+            <p>Logged in as: {{ user.username }}</p>
+            <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type = "submit" class = "btn btn-light btn-sm">Logout</button>
+            </form>
+        {% else %}
+            <a href = "{% url 'login' %}" class = "btn btn-light btn-sm">Login</a>
+        {% endif %}
     </header>
 
     <!-- Navigation bar with two buttons -->

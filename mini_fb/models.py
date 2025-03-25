@@ -4,6 +4,7 @@
 # in the Django application, including name, city, email, and profile image URL.
 from django.db import models
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 
 
@@ -18,6 +19,10 @@ class Profile(models.Model):
     email = models.EmailField(unique=True)
     # URL string for the user's profile image (maximum length: 50 characters)
     profile_image_url = models.CharField(max_length=50)
+    # link profile to Django User
+    user = models.ForeignKey(User, on_delete = models.CASCADE, null = True)
+
+
 
     # returns a readable representation of the profile).
     def __str__(self):
@@ -79,16 +84,11 @@ class Profile(models.Model):
         """
         Returns a list of potential friends that the user is not yet friends with.
         """
-        # Get all profiles except self
-        all_profiles = Profile.objects.exclude(pk=self.pk)
+        # Get IDs of current friends
+        friend_ids = [friend.pk for friend in self.get_friends()]
 
-        # Get the user's current friends
-        current_friends = self.get_friends()
-
-        # Exclude friends from the suggestion list
-        suggested_friends = all_profiles.exclude(pk__in=[friend.pk for friend in current_friends])
-
-        return suggested_friends
+         # Return all profiles excluding self and existing friends
+        return Profile.objects.exclude(pk=self.pk).exclude(pk__in=friend_ids)
     
     def get_news_feed(self):
         """
@@ -103,6 +103,8 @@ class Profile(models.Model):
         ).order_by('-timestamp')  # Most recent first
 
         return status_messages
+    
+    
     
 class StatusMessage(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)  # Automatically set the timestamp when created

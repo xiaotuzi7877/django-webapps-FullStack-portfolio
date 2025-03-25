@@ -62,20 +62,24 @@ showing their name, city, email, and profile image.
                     {% endwith %}
 
                     <!-- Update & Delete Buttons -->
-                    <div class="status-actions">
-                        <a href="{% url 'update_status' status.pk %}" class="update-button">Update</a>
-                        <a href="{% url 'delete_status' status.pk %}" class="delete-button">Delete</a>
-                    </div>
+                    {% if user.is_authenticated and profile.user == user %}
+                        <div class="status-actions">
+                            <a href="{% url 'update_status' status.pk %}" class="update-button">Update</a>
+                            <a href="{% url 'delete_status' status.pk %}" class="delete-button">Delete</a>
+                        </div>
+                    {% endif %}
                 </div>
             {% empty %}
                 <p class="no-status">No status messages yet.</p>
             {% endfor %}
 
             <!-- Buttons Container: Centered and in the same line -->
-            <div class="button-container">
-                <a href="{% url 'create_status' profile.pk %}" class="button">Post a Status</a>
-                <a href="{% url 'update_profile' profile.pk %}" class="button">Update Profile</a>
-            </div>
+            {% if user.is_authenticated and profile.user == user %}
+                <div class="button-container">
+                    <a href="{% url 'create_status' profile.pk %}" class="button">Post a Status</a>
+                    <a href="{% url 'update_profile' profile.pk %}" class="button">Update Profile</a>
+                </div>
+            {% endif %}
         </div> 
 
         <!-- Connections Section -->
@@ -98,14 +102,16 @@ showing their name, city, email, and profile image.
 
             <div class="status-title">Friend Suggestions</div>
             <div class="profile-grid">
-                {% for suggested_friend in suggested_friends %}
+                {% for suggested_friend in suggested_friends_preview %}
                     <div class="profile-card">
                         <img src="{% static suggested_friend.profile_image_url %}" class="profile-image-grid" alt="{{ suggested_friend.first_name }}'s picture">
                         <a href="{% url 'show_profile' suggested_friend.pk %}" class="profile-name-link">
                             {{ suggested_friend.first_name }} {{ suggested_friend.last_name }}
                         </a>
                         <br>
-                        <a href="{% url 'add_friend' profile.pk suggested_friend.pk %}" class="button mt-2">Add Friend</a>
+                        {% if user.is_authenticated and profile.user == user %}
+                            <a href="{% url 'add_friend' profile.pk suggested_friend.pk %}" class="button mt-2">Add Friend</a>
+                        {% endif %}
                     </div>
                 {% empty %}
                     <p class="no-status">No friend suggestions available.</p>
@@ -115,17 +121,19 @@ showing their name, city, email, and profile image.
             <!-- Button row in Connections section -->
             <div class="text-center mt-4">
                 <a href="{% url 'friend_suggestions' profile.pk %}" class="button">See Friend Suggestions</a>
-                <a href="{% url 'news_feed' profile.pk %}" class="button">News Feed</a>
+                {% if user.is_authenticated and profile.user == user %}
+                    <a href="{% url 'news_feed' profile.pk %}" class="button">News Feed</a>
+                {% endif %}
             </div>
         </div>
 
 
 
 
-                <!-- Back button to return to all profiles -->
-                <div class="card-footer text-center">
-                    <a href="{% url 'show_all_profiles' %}" class="button">Back to Profiles</a>
-                </div>
+            <!-- Back button to return to all profiles -->
+            <div class="card-footer text-center">
+                <a href="{% url 'show_all_profiles' %}" class="button">Back to Profiles</a>
+            </div>
 
                 
 

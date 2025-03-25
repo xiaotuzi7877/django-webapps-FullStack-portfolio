@@ -16,7 +16,7 @@
     
     <div class="profile-grid">
         {% for suggested_friend in suggested_friends %}
-            <div class="profile-card">
+            <div class="suggestion-card">
                 <img src="{% static suggested_friend.profile_image_url %}" class="profile-image-grid" alt="{{ suggested_friend.first_name }}'s picture">
                 <a href="{% url 'show_profile' suggested_friend.pk %}" class="profile-name-link">
                     {{ suggested_friend.first_name }} {{ suggested_friend.last_name }}

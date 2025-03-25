@@ -14,6 +14,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Friend, Profile, StatusMessage, Image, StatusImage
 from .forms import CreateProfileForm, CreateStatusMessageForm, UpdateProfileForm
 from django.urls import reverse
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 from .models import Profile
@@ -51,6 +52,8 @@ class ShowProfilePageView(DetailView):
         context = super().get_context_data(**kwargs)
         profile = self.get_object()
         context["friends"] = profile.get_friends()  # Use the get_friends method
+        # show at most 4 friends suggestions
+        context["suggested_friends_preview"] = profile.get_friend_suggestions()[:4] 
         return context
           
 def create_profile(request):
@@ -76,7 +79,7 @@ def create_profile(request):
             form = CreateProfileForm()
     return render(request, "mini_fb/create_profile.html", {"form": form})
 
-class CreateProfileView(CreateView):
+class CreateProfileView(LoginRequiredMixin, CreateView):
     """
     A class-based view for creating a new Profile.
     
@@ -93,7 +96,7 @@ class CreateProfileView(CreateView):
         """  
         return reverse("show_profile", kwargs={"pk": self.object.pk})
 
-class CreateStatusMessageView(CreateView):
+class CreateStatusMessageView(LoginRequiredMixin, CreateView):
     """
     View to create a new StatusMessage for a given Profile.
     - Uses the `CreateStatusMessageForm`.
@@ -149,12 +152,11 @@ class CreateStatusMessageView(CreateView):
 
         return super().form_valid(form)
 
-
     def get_success_url(self):
         """redirect to the profile page after positing status"""
         return reverse("show_profile", kwargs = {"pk": self.kwargs['pk']})
 
-class UpdateProfileView(UpdateView):
+class UpdateProfileView(LoginRequiredMixin, UpdateView):
     """
     View to handle updating an existing Profile in the Mini Facebook application.
 
@@ -175,7 +177,7 @@ class UpdateProfileView(UpdateView):
         return reverse("show_profile", kwargs={"pk": self.object.pk})
     
 
-class DeleteStatusMessageView(DeleteView):
+class DeleteStatusMessageView(LoginRequiredMixin, DeleteView):
     """
     View to handle the deletion of a StatusMessage in the Mini Facebook application.
 
@@ -196,7 +198,7 @@ class DeleteStatusMessageView(DeleteView):
         """Redirect back to the profile page after deleting a status message."""
         return reverse("show_profile", kwargs={"pk": self.object.profile.pk})
     
-class UpdateStatusMessageView(UpdateView):
+class UpdateStatusMessageView(LoginRequiredMixin, UpdateView):
     """
     View to handle updating an existing StatusMessage in the Mini Facebook application.
 
@@ -219,7 +221,7 @@ class UpdateStatusMessageView(UpdateView):
         else:
             return reverse("show_all_profiles")  # Fallback in case of error
 
-class AddFriendView(View):
+class AddFriendView(LoginRequiredMixin, View):
     """
     Handles adding a friend based on URL parameters.
     """
@@ -244,7 +246,7 @@ class ShowFriendSuggestionsView(DetailView):
         context["suggested_friends"] = profile.get_friend_suggestions()
         return context
     
-class ShowNewsFeedView(DetailView):
+class ShowNewsFeedView(LoginRequiredMixin, DetailView):
     """
     View to display the news feed for a given Profile.
 
