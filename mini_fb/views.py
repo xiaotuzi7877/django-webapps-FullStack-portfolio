@@ -15,6 +15,7 @@ from .models import Friend, Profile, StatusMessage, Image, StatusImage
 from .forms import CreateProfileForm, CreateStatusMessageForm, UpdateProfileForm
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import TemplateView
 
 # Create your views here.
 from .models import Profile
@@ -55,7 +56,24 @@ class ShowProfilePageView(DetailView):
         # show at most 4 friends suggestions
         context["suggested_friends_preview"] = profile.get_friend_suggestions()[:4] 
         return context
-          
+    
+# new view for the logged-in user
+class ShowMyProfileView(LoginRequiredMixin, DetailView):
+    model = Profile
+    template_name = "mini_fb/show_profile.html"
+    context_object_name = "profile"
+
+    def get_object(self):
+        return get_object_or_404(Profile, user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        profile = self.get_object()
+        context["friends"] = profile.get_friends()
+        context["suggested_friends_preview"] = profile.get_friend_suggestions()[:4]
+        return context
+
+    
 def create_profile(request):
     """
     Handles the creation of a new Profile.
@@ -176,6 +194,10 @@ class UpdateProfileView(LoginRequiredMixin, UpdateView):
         """redirect to the updated profile page"""
         return reverse("show_profile", kwargs={"pk": self.object.pk})
     
+    def get_object(self):
+        """Use Logged-in User Instead of pk"""
+        return get_object_or_404(Profile, user=self.request.user)
+    
 
 class DeleteStatusMessageView(LoginRequiredMixin, DeleteView):
     """
@@ -246,6 +268,12 @@ class ShowFriendSuggestionsView(DetailView):
         context["suggested_friends"] = profile.get_friend_suggestions()
         return context
     
+    def get_object(self):
+        """Use Logged-in User Instead of pk"""
+        if not self.request.user.is_authenticated:
+            raise Http404("User must be logged in to view suggestions")
+        return get_object_or_404(Profile, user=self.request.user)
+    
 class ShowNewsFeedView(LoginRequiredMixin, DetailView):
     """
     View to display the news feed for a given Profile.
@@ -275,3 +303,10 @@ class ShowNewsFeedView(LoginRequiredMixin, DetailView):
         profile = self.get_object()
         context["news_feed"] = profile.get_news_feed()
         return context
+    
+    def get_object(self):
+        """Use Logged-in User Instead of pk"""
+        return get_object_or_404(Profile, user=self.request.user)
+
+class LogoutConfirmationView(TemplateView):
+    template_name = "mini_fb/logged_out.html"

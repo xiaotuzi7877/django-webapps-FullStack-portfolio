@@ -14,21 +14,29 @@
 <div class="status-container">
     <div class="status-title">Friend Suggestions for {{ profile.first_name }} {{ profile.last_name }}</div>
     
+    <!-- Add this wrapper to center the content -->
     <div class="profile-grid">
         {% for suggested_friend in suggested_friends %}
-            <div class="suggestion-card">
+            <div class="profile-card text-center">
                 <img src="{% static suggested_friend.profile_image_url %}" class="profile-image-grid" alt="{{ suggested_friend.first_name }}'s picture">
-                <a href="{% url 'show_profile' suggested_friend.pk %}" class="profile-name-link">
-                    {{ suggested_friend.first_name }} {{ suggested_friend.last_name }}
-                </a>
-                <br>
-                <a href="{% url 'add_friend' profile.pk suggested_friend.pk %}" class="button mt-2">Add Friend</a>
+                
+                <!-- Name below image -->
+                <div class="mt-2">
+                    <a href="{% url 'show_profile' suggested_friend.pk %}" class="profile-name-link">
+                        {{ suggested_friend.first_name }} {{ suggested_friend.last_name }}
+                    </a>
+                </div>
+    
+                <!-- Add Friend button under name -->
+                <div class="mt-2">
+                    <a href="{% url 'add_friend' profile.pk suggested_friend.pk %}" class="button">Add Friend</a>
+                </div>
             </div>
         {% empty %}
             <p class="no-status">No new friends to suggest right now.</p>
         {% endfor %}
     </div>
-
+    
     <!-- Buttons -->
     <div class="text-center mt-4">
         <a href="{% url 'show_profile' profile.pk %}" class="button">Back to Profile</a>

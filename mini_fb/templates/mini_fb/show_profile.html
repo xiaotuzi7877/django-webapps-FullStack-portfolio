@@ -76,8 +76,8 @@ showing their name, city, email, and profile image.
             <!-- Buttons Container: Centered and in the same line -->
             {% if user.is_authenticated and profile.user == user %}
                 <div class="button-container">
-                    <a href="{% url 'create_status' profile.pk %}" class="button">Post a Status</a>
-                    <a href="{% url 'update_profile' profile.pk %}" class="button">Update Profile</a>
+                    <a href="{% url 'create_status' %}" class="button">Post a Status</a>
+                    <a href="{% url 'update_profile' %}" class="button">Update Profile</a>
                 </div>
             {% endif %}
         </div> 
@@ -105,12 +105,15 @@ showing their name, city, email, and profile image.
                 {% for suggested_friend in suggested_friends_preview %}
                     <div class="profile-card">
                         <img src="{% static suggested_friend.profile_image_url %}" class="profile-image-grid" alt="{{ suggested_friend.first_name }}'s picture">
-                        <a href="{% url 'show_profile' suggested_friend.pk %}" class="profile-name-link">
+            
+                        <!-- Display name on its own line -->
+                        <a href="{% url 'show_profile' suggested_friend.pk %}" class="profile-name-link d-block mb-2">
                             {{ suggested_friend.first_name }} {{ suggested_friend.last_name }}
                         </a>
-                        <br>
+            
+                        <!-- Button below name -->
                         {% if user.is_authenticated and profile.user == user %}
-                            <a href="{% url 'add_friend' profile.pk suggested_friend.pk %}" class="button mt-2">Add Friend</a>
+                            <a href="{% url 'add_friend' profile.pk suggested_friend.pk %}" class="button mt-2 d-inline-block">Add Friend</a>
                         {% endif %}
                     </div>
                 {% empty %}
@@ -120,9 +123,9 @@ showing their name, city, email, and profile image.
 
             <!-- Button row in Connections section -->
             <div class="text-center mt-4">
-                <a href="{% url 'friend_suggestions' profile.pk %}" class="button">See Friend Suggestions</a>
+                <a href="{% url 'friend_suggestions' %}" class="button">See Friend Suggestions</a>
                 {% if user.is_authenticated and profile.user == user %}
-                    <a href="{% url 'news_feed' profile.pk %}" class="button">News Feed</a>
+                    <a href="{% url 'news_feed' %}" class="button">News Feed</a>
                 {% endif %}
             </div>
         </div>
