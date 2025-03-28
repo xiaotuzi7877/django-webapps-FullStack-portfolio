@@ -1,3 +1,13 @@
+<!--
+File: login.html  
+Author: Li Ziyang (miclilzy@bu.edu)  
+Date: March 28, 2025  
+
+Description:  
+This template renders the login page for the Mini Facebook application.  
+It extends the base layout and includes a form for users to log in using Django’s built-in authentication system.  
+The form uses CSRF protection and includes a hidden input field to redirect users to their own profile page (`my_profile`) upon successful login.   
+ -->
 {% extends "base.html" %}
 
 {% block content %}

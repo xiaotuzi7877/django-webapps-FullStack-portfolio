@@ -38,12 +38,33 @@ class CreateProfileForm(forms.ModelForm):
         fields = ['first_name', 'last_name', 'city', 'email', 'profile_image_url']
 
 class CreateStatusMessageForm(forms.ModelForm):
-    """Form for posting a stust message"""
+    """
+    A Django ModelForm for creating a new StatusMessage.
+
+    Attributes:
+        message (TextField): The content of the status message.
+
+    Meta:
+        model (StatusMessage): Specifies the StatusMessage model.
+        fields (list): Includes only the 'message' field in the form.
+    """
     class Meta:
         model = StatusMessage
         fields = ['message']    
 
 class UpdateProfileForm(forms.ModelForm):
+    """
+    A Django ModelForm for updating an existing Profile.
+
+    Attributes:
+        city (CharField): The city of the user.
+        email (EmailField): The email address of the user.
+        profile_image_url (CharField): The profile image URL of the user.
+
+    Meta:
+        model (Profile): Specifies the Profile model.
+        fields (list): Includes 'city', 'email', and 'profile_image_url' fields.
+    """
     class Meta:
         model = Profile
         fields = ['city', 'email', 'profile_image_url']

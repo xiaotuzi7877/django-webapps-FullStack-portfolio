@@ -193,11 +193,13 @@ class UpdateProfileView(LoginRequiredMixin, UpdateView):
     template_name = "mini_fb/update_profile_form.html"
 
     def get_context_data(self, **kwargs):
+        """Add UserCreationForm to the template context."""
         context = super().get_context_data(**kwargs)
         context["user_form"] = UserCreationForm()
         return context
 
     def post(self, request, *args, **kwargs):
+        """Handle form submission for updating both user and profile."""
         user_form = UserCreationForm(request.POST)
         profile_form = self.form_class(request.POST)
 
@@ -327,4 +329,5 @@ class ShowNewsFeedView(LoginRequiredMixin, DetailView):
         return get_object_or_404(Profile, user=self.request.user)
 
 class LogoutConfirmationView(TemplateView):
+    """Render the logout confirmation page."""
     template_name = "mini_fb/logged_out.html"
