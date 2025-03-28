@@ -16,6 +16,8 @@ from .forms import CreateProfileForm, CreateStatusMessageForm, UpdateProfileForm
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 
 # Create your views here.
 from .models import Profile
@@ -190,13 +192,29 @@ class UpdateProfileView(LoginRequiredMixin, UpdateView):
     form_class = UpdateProfileForm
     template_name = "mini_fb/update_profile_form.html"
 
-    def get_success_url(self):
-        """redirect to the updated profile page"""
-        return reverse("show_profile", kwargs={"pk": self.object.pk})
-    
-    def get_object(self):
-        """Use Logged-in User Instead of pk"""
-        return get_object_or_404(Profile, user=self.request.user)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_form"] = UserCreationForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user_form = UserCreationForm(request.POST)
+        profile_form = self.form_class(request.POST)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user = user_form.save()
+            login(request, user)
+
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            profile.save()
+
+            return redirect("show_profile", pk=profile.pk)
+
+        return render(request, self.template_name, {
+            "user_form": user_form,
+            "form": profile_form
+        })
     
 
 class DeleteStatusMessageView(LoginRequiredMixin, DeleteView):
