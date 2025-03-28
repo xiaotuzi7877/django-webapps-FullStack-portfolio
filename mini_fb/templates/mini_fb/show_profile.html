@@ -76,7 +76,7 @@ showing their name, city, email, and profile image.
             <!-- Buttons Container: Centered and in the same line -->
             {% if user.is_authenticated and profile.user == user %}
                 <div class="button-container">
-                    <a href="{% url 'create_status' %}" class="button">Post a Status</a>
+                    <a href="{% url 'create_status' profile.pk %}" class="button">Post a Status</a>
                     <a href="{% url 'update_profile' %}" class="button">Update Profile</a>
                 </div>
             {% endif %}
