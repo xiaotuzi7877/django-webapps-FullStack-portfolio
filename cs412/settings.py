@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'quotes',
     'restaurant',
     'mini_fb',
+    'voter_analytics',
 ]
 
 MIDDLEWARE = [
@@ -123,7 +124,6 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/' # note: no leading slash!
-
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL= "media/"  # note: no leading slash!
 
