@@ -1,0 +1,101 @@
+{% block content %}
+  <h1>Voter Analytics - Graphs</h1>
+
+  <!-- 
+      Filter Form 
+      (Same fields as your Task 2: party, min_year, max_year, score, and election checkboxes)
+  -->
+  <form method="get" action="{% url 'graphs' %}">
+    <!-- Party Drop-down -->
+    <label for="party">Party:</label>
+    <select name="party" id="party">
+      <option value="">-- Any Party --</option>
+      <option value="DEM">DEM</option>
+      <option value="REP">REP</option>
+      <option value="Unaffiliated">Unaffiliated</option>
+      <!-- etc. if you have others -->
+    </select>
+
+    <!-- Min Year -->
+    <label for="min_year">Born After (Min Year):</label>
+    <select name="min_year" id="min_year">
+      <option value="">-- None --</option>
+      {% for y in years %}
+        <option value="{{ y }}">{{ y }}</option>
+      {% endfor %}
+    </select>
+
+    <!-- Max Year -->
+    <label for="max_year">Born Before (Max Year):</label>
+    <select name="max_year" id="max_year">
+      <option value="">-- None --</option>
+      {% for y in years %}
+        <option value="{{ y }}">{{ y }}</option>
+      {% endfor %}
+    </select>
+
+    <!-- Voter Score -->
+    <label for="score">Voter Score:</label>
+    <select name="score" id="score">
+      <option value="">-- Any Score --</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+
+    <!-- Elections (checkboxes) -->
+    <div>
+      <label>
+        <input type="checkbox" name="v20state" value="true">
+        2020 State
+      </label>
+      <label>
+        <input type="checkbox" name="v21town" value="true">
+        2021 Town
+      </label>
+      <label>
+        <input type="checkbox" name="v21primary" value="true">
+        2021 Primary
+      </label>
+      <label>
+        <input type="checkbox" name="v22general" value="true">
+        2022 General
+      </label>
+      <label>
+        <input type="checkbox" name="v23town" value="true">
+        2023 Town
+      </label>
+    </div>
+
+    <button type="submit">Filter</button>
+  </form>
+
+  <!-- 
+      Display the Charts 
+      (These variables come from your GraphsView context:
+         yob_chart, party_chart, participation_chart)
+  -->
+  <hr>
+
+  <h2>1) Voters by Year of Birth</h2>
+  <div>
+    {{ yob_chart|safe }}
+  </div>
+
+  <hr>
+
+  <h2>2) Voter Distribution by Party</h2>
+  <div>
+    {{ party_chart|safe }}
+  </div>
+
+  <hr>
+
+  <h2>3) Participation by Election</h2>
+  <div>
+    {{ participation_chart|safe }}
+  </div>
+
+{% endblock content %}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head><title>Voter List</title></head>
+<body style="background-color:#e0e0e0; font-family:Arial;">
+
+    <div style="background-color: white; padding: 10px; text-align: right;">
+        <a href="{% url 'home' %}">Home</a> |
+        <a href="{% url 'voters' %}">Show Voter List</a> |
+        <a href="{% url 'graphs' %}">Show Graphs</a>
+    </div>
+
+    <h1>Voter List</h1>
+
+    <form method="get">
+        <label>Party Affiliation:</label>
+        <select name="party">
+            <option value="">Any</option>
+            <option value="D">D</option>
+            <option value="R">R</option>
+            <option value="U">U</option>
+        </select>
+
+        <label>Voter Score:</label>
+        <select name="score">
+            <option value="">Any</option>
+            {% for i in "012345"|make_list %}
+                <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Min Year of Birth:</label>
+        <select name="min_year">
+            <option value="">Any</option>
+            {% for year in years %}
+                <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Max Year of Birth:</label>
+        <select name="max_year">
+            <option value="">Any</option>
+            {% for year in years %}
+                <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Election Participation:</label>
+        <label><input type="checkbox" name="v20state">v20state</label>
+        <label><input type="checkbox" name="v21town">v21town</label>
+        <label><input type="checkbox" name="v21primary">v21primary</label>
+        <label><input type="checkbox" name="v22general">v22general</label>
+        <label><input type="checkbox" name="v23town">v23town</label>
+
+        <button type="submit">Search</button>
+    </form>
+
+    <p>{{ page_obj.paginator.count }} results found.</p>
+
+    <ul>
+    {% for voter in page_obj %}
+        <li>
+            <a href="{% url 'voter' voter.pk %}">
+                {{ voter.first_name }} {{ voter.last_name }}
+            </a>,
+            {{ voter.street_number }} {{ voter.street_name }},
+            {{ voter.date_of_birth }},
+            {{ voter.party_affiliation }},
+            Score: {{ voter.voter_score }}
+        </li>
+    {% endfor %}
+    </ul>
+
+    <div>
+        {% if page_obj.has_previous %}
+            <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+
+        {% if page_obj.has_next %}
+            <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+        {% endif %}
+    </div>
+</body>
+</html>
