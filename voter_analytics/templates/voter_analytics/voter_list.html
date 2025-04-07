@@ -1,3 +1,25 @@
+<!--
+voter_list.html
+
+This Django template displays a paginated, filterable table of registered voters.
+
+Features:
+- Navigation bar with links to Home, Voter List, and Graphs pages.
+- A filter form allowing users to narrow down the voter list by:
+    - Party affiliation
+    - Voter score
+    - Year of birth range
+    - Participation in past elections (2020–2023)
+- A styled table showing voter details including name, address, date of birth, party, and score.
+- A result summary section showing the number of matching results and a "Next page" shortcut.
+- Pagination links at the bottom to navigate through the full dataset.
+
+Template Context Variables:
+- page_obj: A Django pagination object containing the current page of voter results.
+- years: A list of birth years (1900–2024) used in dropdown filters.
+-->
+
+
 {% load static %}
 <!DOCTYPE html>
 <html>
@@ -29,6 +51,7 @@
         <option value="U">U</option>
       </select>
     </div>
+
     <div class="filter-row">
       <label for="score">Voter Score:</label>
       <select name="score" id="score">
@@ -38,6 +61,7 @@
         {% endfor %}
       </select>
     </div>
+
     <div class="filter-row">
       <label for="min_year">Min Year of Birth:</label>
       <select name="min_year" id="min_year">
@@ -47,6 +71,7 @@
         {% endfor %}
       </select>
     </div>
+
     <div class="filter-row">
       <label for="max_year">Max Year of Birth:</label>
       <select name="max_year" id="max_year">
@@ -56,6 +81,7 @@
         {% endfor %}
       </select>
     </div>
+
     <div class="filter-row">
       <label>Election Participation:</label>
       <div class="checkbox-group">
@@ -66,6 +92,7 @@
         <label><input type="checkbox" name="v23town"> v23town</label>
       </div>
     </div>
+
     <div class="filter-row filter-submit">
       <button type="submit">Search</button>
     </div>
@@ -73,9 +100,17 @@
 </div>
 
 <h1>Voter List</h1>
-<p>{{ page_obj.paginator.count }} results found.</p>
 
 <div class="voter-list-container">
+  <!-- 将 "results found" 板块融入到 voter 表格 section 中，位于表格上方 -->
+  <div class="results-found-box">
+    <span>{{ page_obj.paginator.count }} results found.</span>
+    {% if page_obj.has_next %}
+      <a class="results-next-btn" href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">
+         Next page
+      </a>
+    {% endif %}
+  </div>
   <table class="voter-list-table">
     <thead>
       <tr>

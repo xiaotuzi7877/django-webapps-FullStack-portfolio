@@ -1,3 +1,18 @@
+<!--
+voter_detail.html
+
+This Django template displays detailed information about a single voter.
+
+Features:
+- A clean, readable layout that includes personal voter data, address, birth and registration dates,
+  party affiliation, precinct, voting score, and historical election participation.
+- A Google Maps link for locating the voter's address.
+- A back link to return to the voter list view.
+
+Template Context Variables:
+- voter: A Voter model instance passed from VoterDetailView.
+-->
+
 {% load static %}
 <link rel="stylesheet" href="{% static 'voter_analytics/css/styles.css' %}">
 

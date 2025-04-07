@@ -1,3 +1,16 @@
+"""
+views.py
+
+Defines the core views for the voter_analytics Django application, enabling the
+display of voter data, graphical analytics, and filtering functionality.
+
+This module includes:
+- VoterListView: Lists and filters registered voters from the database.
+- VoterDetailView: Shows detailed information for a single voter.
+- GraphsView: Generates interactive visualizations using Plotly.
+- HomeView: Renders a static homepage template.
+"""
+
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView, TemplateView
 from django.db.models import Q, Count
@@ -15,12 +28,22 @@ import pandas as pd
 
 
 class VoterListView(ListView):
+    """
+    Displays a paginated and filterable list of all registered voters.
+
+    Users can filter by party affiliation, voter score, year of birth range,
+    and participation in specific elections. The results are shown in a
+    styled table with pagination.
+    """
     model = Voter
     template_name = 'voter_analytics/voter_list.html'
     context_object_name = 'voters'
     paginate_by = 100
 
     def get_queryset(self):
+        """
+        Returns the filtered queryset based on GET parameters.
+        """
         queryset = super().get_queryset()
         party = self.request.GET.get('party')
         score = self.request.GET.get('score')
@@ -49,22 +72,44 @@ class VoterListView(ListView):
         return queryset.order_by('last_name', 'first_name')
 
     def get_context_data(self, **kwargs):
+        """
+        Adds a list of years (1900–2024) to the template context for dropdown filters.
+        """
         context = super().get_context_data(**kwargs)
         context['years'] = range(1900, 2025)  # for dropdown
         return context
 
 
 class VoterDetailView(DetailView):
+    """
+    Displays full details about a specific voter.
+
+    Includes personal information, registration and birth date,
+    election participation history, and a Google Maps link to the voter's address.
+    """
     model = Voter
     template_name = 'voter_analytics/voter_detail.html'
     context_object_name = 'voter'
 
 class GraphsView(ListView):
+    """
+    Displays interactive graphs to summarize voter data using Plotly.
+
+    Includes:
+    - A histogram of birth years.
+    - A pie chart of party affiliations.
+    - A bar chart showing participation in five past elections.
+    All graphs respond to the same filters used in the voter list.
+    """
     model = Voter
     template_name = 'voter_analytics/graphs.html'
     context_object_name = 'voters'
 
     def get_queryset(self):
+        """
+        Returns the filtered queryset of voters based on GET parameters,
+        for generating graphs.
+        """
         queryset = super().get_queryset()
         request = self.request
 
@@ -95,6 +140,14 @@ class GraphsView(ListView):
         return queryset
 
     def get_context_data(self, **kwargs):
+        """
+        Builds Plotly graphs and adds them to the template context.
+
+        Generates:
+        - Birth year histogram.
+        - Party affiliation pie chart.
+        - Election participation bar chart.
+        """
         context = super().get_context_data(**kwargs)
         voters = self.get_queryset()
 
@@ -104,7 +157,7 @@ class GraphsView(ListView):
         yob_counts = voters.values_list('date_of_birth__year', flat=True)
         yob_fig = px.histogram(
             x=yob_counts,
-            nbins=125,  # 让柱子更细，可自行调整
+            nbins=125, 
             title=f"Voter Distribution by Year of Birth (n={voters.count()})"
         )
         yob_fig.update_layout(bargap=0.05)
@@ -126,28 +179,25 @@ class GraphsView(ListView):
         party_labels = df['party_affiliation']
         party_values = df['count']
 
-        # 生成饼图：让宽高合适，留出右边空间给图例
+    
         party_fig = px.pie(
             values=party_values,
             names=party_labels,
             title=f"Voter Distribution by Party Affiliation (n={total_voters})",
-            width=700,      # 画布宽
-            height=600      # 画布高
+            width=900,      
+            height=1200      
         )
 
-        # 布局设置：标题居中、右边留出一定空间放图例
         party_fig.update_layout(
             title_x=0.5,
             title_font_size=18,
             margin=dict(l=40, r=150, t=80, b=40),
             legend=dict(
-                x=1.2,   # 图例在 x=1.2 处（右侧）
-                y=0.5    # 垂直方向居中
+                x=1.2,   
+                y=0.5    
             )
         )
 
-        # 让 Plotly 自动决定标签放内或外，一般大块扇区在内，小块扇区在外
-        # 仅显示"标签+百分比"，如果想再加“value”，可改成 'label+percent+value'
         party_fig.update_traces(
             textposition='auto',
             textinfo='label+percent'
@@ -180,9 +230,11 @@ class GraphsView(ListView):
         participation_fig.update_yaxes(range=[0, max_count + 1])
         context['participation_chart'] = mark_safe(participation_fig.to_html(full_html=False))
 
-        # 用于下拉过滤的年份范围
         context['years'] = range(1900, 2025)
         return context
 
 class HomeView(TemplateView):
+    """
+    Renders the static homepage of the application.
+    """
     template_name = 'voter_analytics/home.html'

@@ -1,3 +1,13 @@
+"""
+models.py
+
+Defines the database schema and data import logic for the voter_analytics Django application.
+
+This module includes:
+- Voter: A Django model representing registered voters in Newton, MA.
+- load_data: A utility function to import voter records from a CSV file into the database.
+"""
+
 from django.db import models
 import csv
 from datetime import datetime
@@ -5,6 +15,32 @@ import os
 from django.conf import settings
 
 class Voter(models.Model):
+    """
+    Represents a registered voter in Newton, Massachusetts.
+
+    This model includes personal information, address details, party affiliation,
+    precinct assignment, and historical voting participation in five elections
+    (2020–2023). It also includes a computed `voter_score` representing the number
+    of elections the voter participated in.
+
+    Attributes:
+        last_name (str): Voter's last name.
+        first_name (str): Voter's first name.
+        street_number (str): House/building number of the residential address.
+        street_name (str): Street name of the residential address.
+        apartment_number (str, optional): Apartment or unit number.
+        zip_code (str): ZIP code of the residential address.
+        date_of_birth (date): Voter's birth date.
+        registration_date (date): Date the voter registered to vote.
+        party_affiliation (str): 1–2 character party code (e.g., 'D', 'R', 'U').
+        precinct_number (str): Assigned precinct for the voter.
+        v20state (bool): Voted in the 2020 state election.
+        v21town (bool): Voted in the 2021 town election.
+        v21primary (bool): Voted in the 2021 primary election.
+        v22general (bool): Voted in the 2022 general election.
+        v23town (bool): Voted in the 2023 town election.
+        voter_score (int): Total number of elections voted in (0–5).
+    """
     last_name = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100)
     street_number = models.CharField(max_length=10)
@@ -25,10 +61,20 @@ class Voter(models.Model):
     voter_score = models.IntegerField(default=0)
 
     def __str__(self):
+        """
+        Returns a readable representation of the voter.
+        """
         return f"{self.first_name} {self.last_name} - Precinct {self.precinct_number}"
 
 
 def load_data(csv_path=None):
+    """
+    Imports voter data from a CSV file and creates Voter instances in the database.
+
+    Args:
+        csv_path (str, optional): Path to the CSV file. If not provided,
+                                  defaults to a project-relative path.
+    """
     if csv_path is None:
         csv_path = os.path.join(settings.BASE_DIR, 'voter_analytics', 'newton_voter_data.csv')
 

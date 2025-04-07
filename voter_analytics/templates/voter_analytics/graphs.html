@@ -1,3 +1,25 @@
+<!--
+graphs.html
+
+This Django template renders the graph analytics page for the voter_analytics application.
+
+Features:
+- A navigation bar to switch between the home page, voter list, and graphs.
+- A filter form that allows users to filter voters by party affiliation, birth year range, voter score,
+  and participation in recent elections.
+- Three interactive Plotly charts are rendered based on the filtered voter set:
+    1. Year of Birth Histogram
+    2. Party Affiliation Pie Chart
+    3. Election Participation Bar Chart
+
+Template Context Variables:
+- voters: The filtered queryset of Voter objects.
+- years: List of years (1900–2024) for dropdown filters.
+- yob_chart: Safe HTML representation of the birth year histogram.
+- party_chart: Safe HTML representation of the pie chart.
+- participation_chart: Safe HTML representation of the bar chart.
+-->
+
 {% load static %}
 <!DOCTYPE html>
 <html>
