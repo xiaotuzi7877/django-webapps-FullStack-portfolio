@@ -1,9 +1,17 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'voter_analytics/css/styles.css' %}">
+<div class="navbar">
+    <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">🏠 Home</a>
+    <a href="{% url 'voters' %}" class="{% if request.path == '/voter_analytics/' %}active{% endif %}">📋 Voter List</a>
+    <a href="{% url 'graphs' %}" class="{% if request.path == '/graphs/' %}active{% endif %}">📊 Graphs</a>
+</div>
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Home</title>
 </head>
-<body style="background-color: #ddd; font-family: Arial;">
+<body>
     <h1 style="color: darkblue;">Home</h1>
     <p>
         <a href="{% url 'voters' %}">Show Voter List</a> |

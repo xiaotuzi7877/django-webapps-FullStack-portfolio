@@ -59,7 +59,6 @@ class VoterDetailView(DetailView):
     template_name = 'voter_analytics/voter_detail.html'
     context_object_name = 'voter'
 
-
 class GraphsView(ListView):
     model = Voter
     template_name = 'voter_analytics/graphs.html'
@@ -105,34 +104,55 @@ class GraphsView(ListView):
         yob_counts = voters.values_list('date_of_birth__year', flat=True)
         yob_fig = px.histogram(
             x=yob_counts,
-            nbins=40,
-            title="Voters by Year of Birth"
+            nbins=125,  # 让柱子更细，可自行调整
+            title=f"Voter Distribution by Year of Birth (n={voters.count()})"
         )
+        yob_fig.update_layout(bargap=0.05)
         context['yob_chart'] = mark_safe(yob_fig.to_html(full_html=False))
 
         #
-        # 2) Pie chart by party (no 'Other' grouping)
+        # 2) Pie chart by party
         #
         party_qs = voters.values('party_affiliation').annotate(count=Count('id'))
         df = pd.DataFrame(party_qs)
 
         if not df.empty:
             total_voters = df['count'].sum()
-            # Replace blank or None with something 'Unknown'
             df['party_affiliation'] = df['party_affiliation'].fillna('').replace('', 'Unknown')
-            party_labels = df['party_affiliation']
-            party_values = df['count']
         else:
             total_voters = 0
-            party_labels = []
-            party_values = []
+            df = pd.DataFrame({'party_affiliation': [], 'count': []})
 
+        party_labels = df['party_affiliation']
+        party_values = df['count']
+
+        # 生成饼图：让宽高合适，留出右边空间给图例
         party_fig = px.pie(
             values=party_values,
             names=party_labels,
-            title=f"Voter Distribution by Party Affiliation (n={total_voters})"
+            title=f"Voter Distribution by Party Affiliation (n={total_voters})",
+            width=700,      # 画布宽
+            height=600      # 画布高
         )
-        party_fig.update_traces(textinfo='percent')
+
+        # 布局设置：标题居中、右边留出一定空间放图例
+        party_fig.update_layout(
+            title_x=0.5,
+            title_font_size=18,
+            margin=dict(l=40, r=150, t=80, b=40),
+            legend=dict(
+                x=1.2,   # 图例在 x=1.2 处（右侧）
+                y=0.5    # 垂直方向居中
+            )
+        )
+
+        # 让 Plotly 自动决定标签放内或外，一般大块扇区在内，小块扇区在外
+        # 仅显示"标签+百分比"，如果想再加“value”，可改成 'label+percent+value'
+        party_fig.update_traces(
+            textposition='auto',
+            textinfo='label+percent'
+        )
+
         context['party_chart'] = mark_safe(party_fig.to_html(full_html=False))
 
         #
@@ -145,10 +165,6 @@ class GraphsView(ListView):
             ("2022 General", voters.filter(v22general=True).count()),
             ("2023 Town",    voters.filter(v23town=True).count()),
         ]
-
-        # DEBUG: print to server console
-        print("DEBUG participation_data:", participation_data)
-
         election_labels = [label for (label, count) in participation_data]
         voter_counts    = [count for (label, count) in participation_data]
 
@@ -160,16 +176,13 @@ class GraphsView(ListView):
             text=voter_counts
         )
         participation_fig.update_traces(textposition='outside')
-        # Force y-axis to start at zero
         max_count = max(voter_counts) if voter_counts else 0
         participation_fig.update_yaxes(range=[0, max_count + 1])
-
         context['participation_chart'] = mark_safe(participation_fig.to_html(full_html=False))
 
-        context['years'] = range(1900, 2025)  # for filter form
+        # 用于下拉过滤的年份范围
+        context['years'] = range(1900, 2025)
         return context
-
-
 
 class HomeView(TemplateView):
     template_name = 'voter_analytics/home.html'

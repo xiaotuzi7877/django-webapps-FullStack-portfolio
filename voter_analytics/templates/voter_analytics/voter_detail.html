@@ -1,7 +1,10 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'voter_analytics/css/styles.css' %}">
+
 <!DOCTYPE html>
 <html>
 <head><title>Voter Details</title></head>
-<body style="background-color:#f0f0f0;">
+<body>
     <h1>{{ voter.first_name }} {{ voter.last_name }}</h1>
     <p><strong>Address:</strong> {{ voter.street_number }} {{ voter.street_name }}{% if voter.apartment_number %}, Apt {{ voter.apartment_number }}{% endif %}, Newton, MA {{ voter.zip_code }}</p>
     <p><strong>Born:</strong> {{ voter.date_of_birth }}</p>

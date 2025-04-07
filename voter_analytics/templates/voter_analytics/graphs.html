@@ -1,101 +1,87 @@
-{% block content %}
-  <h1>Voter Analytics - Graphs</h1>
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Graphs</title>
+  <link rel="stylesheet" href="{% static 'voter_analytics/css/styles.css' %}">
+  <link rel="icon" href="data:,">
+</head>
+<body>
+<div class="navbar">
+  <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">🏠 Home</a>
+  <a href="{% url 'voters' %}">📋 Voter List</a>
+  <a href="{% url 'graphs' %}" class="active">📊 Graphs</a>
+</div>
 
-  <!-- 
-      Filter Form 
-      (Same fields as your Task 2: party, min_year, max_year, score, and election checkboxes)
-  -->
-  <form method="get" action="{% url 'graphs' %}">
-    <!-- Party Drop-down -->
-    <label for="party">Party:</label>
-    <select name="party" id="party">
-      <option value="">-- Any Party --</option>
-      <option value="DEM">DEM</option>
-      <option value="REP">REP</option>
-      <option value="Unaffiliated">Unaffiliated</option>
-      <!-- etc. if you have others -->
-    </select>
-
-    <!-- Min Year -->
-    <label for="min_year">Born After (Min Year):</label>
-    <select name="min_year" id="min_year">
-      <option value="">-- None --</option>
-      {% for y in years %}
-        <option value="{{ y }}">{{ y }}</option>
-      {% endfor %}
-    </select>
-
-    <!-- Max Year -->
-    <label for="max_year">Born Before (Max Year):</label>
-    <select name="max_year" id="max_year">
-      <option value="">-- None --</option>
-      {% for y in years %}
-        <option value="{{ y }}">{{ y }}</option>
-      {% endfor %}
-    </select>
-
-    <!-- Voter Score -->
-    <label for="score">Voter Score:</label>
-    <select name="score" id="score">
-      <option value="">-- Any Score --</option>
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-      <option value="4">4</option>
-      <option value="5">5</option>
-    </select>
-
-    <!-- Elections (checkboxes) -->
-    <div>
-      <label>
-        <input type="checkbox" name="v20state" value="true">
-        2020 State
-      </label>
-      <label>
-        <input type="checkbox" name="v21town" value="true">
-        2021 Town
-      </label>
-      <label>
-        <input type="checkbox" name="v21primary" value="true">
-        2021 Primary
-      </label>
-      <label>
-        <input type="checkbox" name="v22general" value="true">
-        2022 General
-      </label>
-      <label>
-        <input type="checkbox" name="v23town" value="true">
-        2023 Town
-      </label>
+<div class="filter-summary-form">
+  <div class="summary-box">
+    Showing <strong>{{ voters.count }}</strong> voters matched the filter criteria.
+  </div>
+  <form method="get">
+    <div class="filter-row">
+      <label for="party">Party Affiliation:</label>
+      <select name="party" id="party">
+        <option value="">Any</option>
+        <option value="D">D</option>
+        <option value="R">R</option>
+        <option value="U">U</option>
+      </select>
     </div>
-
-    <button type="submit">Filter</button>
+    <div class="filter-row">
+      <label for="score">Voter Score:</label>
+      <select name="score" id="score">
+        <option value="">Any</option>
+        {% for i in "012345"|make_list %}
+          <option value="{{ i }}">{{ i }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-row">
+      <label for="min_year">Min Year of Birth:</label>
+      <select name="min_year" id="min_year">
+        <option value="">Any</option>
+        {% for year in years %}
+          <option value="{{ year }}">{{ year }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-row">
+      <label for="max_year">Max Year of Birth:</label>
+      <select name="max_year" id="max_year">
+        <option value="">Any</option>
+        {% for year in years %}
+          <option value="{{ year }}">{{ year }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-row">
+      <label>Election Participation:</label>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="v20state"> v20state</label>
+        <label><input type="checkbox" name="v21town"> v21town</label>
+        <label><input type="checkbox" name="v21primary"> v21primary</label>
+        <label><input type="checkbox" name="v22general"> v22general</label>
+        <label><input type="checkbox" name="v23town"> v23town</label>
+      </div>
+    </div>
+    <div class="filter-row filter-submit">
+      <button type="submit">Search</button>
+    </div>
   </form>
+</div>
 
-  <!-- 
-      Display the Charts 
-      (These variables come from your GraphsView context:
-         yob_chart, party_chart, participation_chart)
-  -->
-  <hr>
-
-  <h2>1) Voters by Year of Birth</h2>
-  <div>
+<h1>Graphs</h1>
+<div class="graph-section">
+  <div class="chart">
     {{ yob_chart|safe }}
   </div>
-
-  <hr>
-
-  <h2>2) Voter Distribution by Party</h2>
-  <div>
+  <div class="chart">
     {{ party_chart|safe }}
   </div>
-
-  <hr>
-
-  <h2>3) Participation by Election</h2>
-  <div>
+  <div class="chart">
     {{ participation_chart|safe }}
   </div>
+</div>
 
-{% endblock content %}
+</body>
+</html>
