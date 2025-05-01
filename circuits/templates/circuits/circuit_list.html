@@ -1,0 +1,166 @@
+{# Name: Li Ziyang #}
+{# BU Email: miclilzy@bu.edu #}
+{# File Description: Template for displaying a list of F1 circuits. #}
+{# Includes filtering options (name, continent), an interactive Leaflet map, #}
+{# and a grid of circuit cards linking to detail pages. #}
+
+{# Extend the base template #}
+{% extends "circuits/base.html" %}
+
+{# Set the page title #}
+{% block title %}All Circuits - F1 Explorer{% endblock %}
+
+{# Start main content block #}
+{% block content %}
+  {# Page heading #}
+  <h1>Explore F1 Circuits</h1>
+
+  {# Filter Form (submits via GET request to the current URL) #}
+  <form method="get" class="row g-2 mb-4">
+    {# Name search input field #}
+    <div class="col-auto">
+      <input
+        type="text"
+        name="q" {# Query parameter for name search #}
+        value="{{ q|default:'' }}" {# Persist search term if provided #}
+        class="form-control"
+        placeholder="Search by name..."
+      >
+    </div>
+
+    {# Continent filter dropdown #}
+    <div class="col-auto">
+      <select name="continent" class="form-select">
+        {# Default option for showing all continents #}
+        <option value="" {% if not selected_continent %}selected{% endif %}>
+          All Continents
+        </option>
+        {# Loop through continent choices provided by the view #}
+        {% for code, label in continent_choices %}
+          <option
+            value="{{ code }}"
+            {% if code == selected_continent %}selected{% endif %} {# Persist selected continent #}
+          >{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    {# Submit button for the filter form #}
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+  </form>
+  {# End Filter Form #}
+
+  {# Container div for the Leaflet map #}
+  <div id="map" style="height: 500px; margin-bottom: 2rem;"></div>
+
+  {# Grid container for displaying circuit cards #}
+  <div class="row">
+    {# Loop through the list of circuits passed from the view #}
+    {% for circuit in circuits %}
+      {# Bootstrap column for each card (adjusts based on screen size) #}
+      <div class="col-md-4 mb-4">
+        {# Card container with fixed height #}
+        <div class="card h-100">
+          {# Display circuit layout image if available #}
+          {% if circuit.layout_image %}
+            <img
+              src="{{ circuit.layout_image.url }}"
+              class="card-img-top"
+              alt="{{ circuit.name }} Layout"
+              style="object-fit: contain; height: 200px;" {# Style image to fit card #}
+            >
+          {# Display a placeholder if no image is available #}
+          {% else %}
+            <div
+              class="card-img-top bg-secondary d-flex align-items-center justify-content-center"
+              style="height: 200px;"
+            >
+              <span class="text-light">No Image</span>
+            </div>
+          {% endif %}
+          {# Card body content #}
+          <div class="card-body d-flex flex-column"> {# Use flexbox for button alignment #}
+            <h5 class="card-title">{{ circuit.name }}</h5>
+            <p class="card-text">{{ circuit.location }}</p>
+            {# Link to the circuit's detail page, aligned to bottom #}
+            <a
+              href="{% url 'circuits:circuit_detail' circuit.pk %}"
+              class="btn btn-primary mt-auto" {# mt-auto pushes button to bottom #}
+            >View Details</a>
+          </div>
+        </div>
+      </div>
+    {# Message displayed if the circuits list is empty (e.g., no search results) #}
+    {% empty %}
+      <p>No circuits found matching your criteria.</p>
+    {% endfor %}
+  </div>
+  {# End Circuit Cards Grid #}
+{% endblock content %}
+{# End main content block #}
+
+{# Start JavaScript block (loads after base template JS) #}
+{% block extra_js %}
+  <script>
+    // Wait for the DOM to be fully loaded before executing map script
+    document.addEventListener('DOMContentLoaded', function() {
+      // Retrieve the JSON string containing circuit data from the template context
+      // Use default '[]' if data is missing, escapejs to handle special chars safely
+      const rawJsonData = '{{ circuits_data_json|default:"[]"|escapejs }}';
+      let circuitData;
+
+      // Safely parse the JSON data
+      try {
+        circuitData = JSON.parse(rawJsonData);
+      } catch (e) {
+        // Log error if JSON is invalid and default to an empty array
+        console.error('Error parsing circuit JSON data:', e, rawJsonData);
+        circuitData = [];
+      }
+
+      // --- Map Initialization ---
+      let mapCenter = [20, 0]; // Default center (roughly Atlantic Ocean)
+      let mapZoom = 2;       // Default zoom level (shows most continents)
+
+      // If circuit data is available, calculate a better center and zoom
+      if (circuitData.length > 0) {
+        const latitudes = circuitData.map(d => d.lat);
+        const longitudes = circuitData.map(d => d.lng);
+        // Calculate the average latitude and longitude for the center point
+        mapCenter = [
+          latitudes.reduce((sum, lat) => sum + lat, 0) / latitudes.length,
+          longitudes.reduce((sum, lng) => sum + lng, 0) / longitudes.length
+        ];
+        // Adjust zoom: zoom in closer if only one circuit is shown
+        mapZoom = circuitData.length === 1 ? 6 : 3;
+      }
+
+      // Create the Leaflet map instance, targeting the 'map' div
+      const map = L.map('map').setView(mapCenter, mapZoom);
+
+      // Add the OpenStreetMap tile layer to the map
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19, // Set maximum zoom level
+        attribution: '© OpenStreetMap contributors' // Required attribution
+      }).addTo(map);
+
+      // --- Add Markers to Map ---
+      // Iterate through the parsed circuit data array
+      circuitData.forEach(item => {
+        // Ensure latitude and longitude are valid numbers before adding marker
+        if (typeof item.lat === 'number' && typeof item.lng === 'number') {
+          // Create a marker at the circuit's coordinates
+          L.marker([item.lat, item.lng])
+            .addTo(map) // Add the marker to the map
+            .bindPopup( // Attach a popup to the marker
+              `<strong>${item.name}</strong><br>` + // Display circuit name
+              `<a href="${item.url}">View Details</a>` // Link to circuit detail page
+            );
+        }
+      });
+    });
+  </script>
+{% endblock extra_js %}
+{# End JavaScript block #}

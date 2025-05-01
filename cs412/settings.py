@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["cs-webapps.bu.edu", "127.0.0.1", "localhost"]
 
+# Setting for where to redirect users after successful login
+LOGIN_REDIRECT_URL = '/circuits/'
 
 
 # Application definition
@@ -43,6 +45,8 @@ INSTALLED_APPS = [
     'restaurant',
     'mini_fb',
     'voter_analytics',
+    'import_export',
+    'circuits',
 ]
 
 MIDDLEWARE = [

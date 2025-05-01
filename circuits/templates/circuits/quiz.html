@@ -1,0 +1,163 @@
+{# Name: Li Ziyang #}
+{# BU Email: miclilzy@bu.edu #}
+{# File Description: Template for the timed F1 quiz. Presents questions one by one #}
+{# with a timer for each, and submits the answers at the end. #}
+
+{# Extend the base template #}
+{% extends "circuits/base.html" %}
+
+{# Set the page title #}
+{% block title %}F1 Quiz - F1 Explorer{% endblock %}
+
+{# Start main content block #}
+{% block content %}
+{# Main container for the quiz interface #}
+<div class="quiz-container">
+  {# Quiz heading #}
+  <h1>F1 Timed Quiz</h1>
+  {# Timer display area #}
+  <div class="quiz-timer">
+    Time remaining: <span id="timer">20</span> seconds {# Timer value updated by JS #}
+  </div>
+
+  {# Quiz form that will submit answers via POST #}
+  <form id="quiz-form" class="quiz-form" method="post" action="{% url 'circuits:quiz' %}">
+    {% csrf_token %} {# Include CSRF token for security #}
+    {# Hidden input to store the start time of the quiz attempt #}
+    <input type="hidden" name="start_time" value="{{ now }}"> {# 'now' is passed from the view #}
+    {# Hidden inputs to pass the specific IDs of the questions presented in this quiz #}
+    {% for id in question_ids %}
+      <input type="hidden" name="question_ids" value="{{ id }}">
+    {% endfor %}
+
+    {# --- Question Blocks Section --- #}
+    {# Render all question blocks; JS controls visibility #}
+    {% for q in questions %}
+      {# Container for a single question and its choices. Initially hidden. #}
+      <div class="quiz-question" id="question-{{ forloop.counter0 }}" style="display: none;">
+        {# Display the question number and text #}
+        <p><strong>{{ forloop.counter }}. {{ q.text }}</strong></p>
+
+        {# Loop through the choices for the current question 'q' #}
+        {% for choice in q.choices.all %}
+          {# Radio button input for the choice #}
+          <input
+            type="radio"
+            name="question_{{ q.id }}" {# Group choices by question ID #}
+            id="choice-{{ choice.id }}" {# Unique ID for the choice #}
+            value="{{ choice.id }}" {# Value submitted will be the choice's primary key #}
+            class="quiz-option-input" {# Class for potential styling #}
+          >
+          {# Clickable label associated with the radio button #}
+          <label for="choice-{{ choice.id }}" class="quiz-option-label">
+            <span>{{ choice.text }}</span> {# Display the choice text #}
+          </label>
+        {% endfor %}
+      </div>
+    {% endfor %}
+    {# --- End Question Blocks Section --- #}
+
+    {# Submit button for the entire quiz, initially hidden #}
+    <button
+      type="submit"
+      id="submit-button"
+      class="btn-quiz-submit" {# Class for styling #}
+      style="display: none;"
+    >Submit Quiz</button>
+  </form>
+  {# End Quiz Form #}
+</div>
+{# End Quiz Container #}
+
+{% endblock content %}
+{# End main content block #}
+
+{# Start JavaScript block for quiz logic #}
+{% block extra_js %}
+<script>
+  // --- Quiz Configuration & Variables ---
+  // Get the total number of questions from the template context
+  const totalQuestionsStr = "{{ questions|length }}"; 
+  
+  // Immediately convert the string count to a number (integer) for use in logic
+  const totalQuestions = parseInt(totalQuestionsStr, 10); 
+
+  // Optional: Check if the conversion was successful
+  if (isNaN(totalQuestions)) {
+      console.error("Error parsing total questions count:", totalQuestionsStr);
+      // Handle error appropriately, maybe set a default or show an error message
+      // For now, the script might fail if totalQuestions is NaN
+  }
+
+  let currentIndex = 0; // Index of the currently displayed question
+  let timeLeft = 20;   // Initial time limit (in seconds) for each question
+  const timerEl = document.getElementById('timer');       // Element to display remaining time
+  const submitBtn = document.getElementById('submit-button'); // The final submit button
+  const questions = document.querySelectorAll('.quiz-question'); // NodeList of all question divs
+
+  // --- Quiz Functions ---
+
+  /**
+   * Hides all question divs and displays the one at the specified index 'n'.
+   * Also resets the timer for the new question.
+   * @param {number} n - The index of the question to show.
+   */
+  function showQuestion(n) {
+    // Hide all question divs first
+    document.querySelectorAll('.quiz-question')
+      .forEach(div => div.style.display = 'none');
+    // Show the specific question div
+    document.getElementById(`question-${n}`).style.display = 'block';
+    // Reset timer for the new question
+    timeLeft = 20; 
+    timerEl.textContent = timeLeft;
+  }
+
+  // Timer interval: Countdown triggers every second (1000ms)
+  const countdown = setInterval(() => {
+    timeLeft--; // Decrement time
+    timerEl.textContent = timeLeft; // Update display
+    // If time runs out for the current question, automatically move to the next one
+    if (timeLeft <= 0) {
+      goNext(); 
+    }
+  }, 1000);
+
+  /**
+   * Moves to the next question or shows the submit button if it's the last question.
+   * Called when time runs out or when a user selects an answer.
+   */
+  function goNext() {
+    // Check if the current question is the last one
+    if (currentIndex === totalQuestions - 1) {
+      clearInterval(countdown); // Stop the timer
+      // Hide the last question
+      document.getElementById(`question-${currentIndex}`).style.display = 'none';
+      // Show the final submit button
+      submitBtn.style.display = 'inline-block'; 
+    } else {
+      // If not the last question, move to the next one
+      currentIndex++;
+      showQuestion(currentIndex); // Display the next question
+    }
+  }
+
+  // --- Initialization ---
+
+  // Initially load question 0 when the page loads
+  showQuestion(0);
+
+  // --- Event Listeners ---
+
+  // Automatically switch to the next question after user selects an answer
+  document.querySelectorAll('.quiz-question input[type=radio]')
+    .forEach(input => {
+      // Add a 'change' event listener to each radio button
+      input.addEventListener('change', () => {
+        // When a choice is selected, immediately move to the next question/step
+        goNext(); 
+      });
+    });
+</script>
+{% endblock extra_js %}
+{# End JavaScript block #}

@@ -27,6 +27,8 @@ urlpatterns = [
     path('restaurant/', include('restaurant.urls')),
     path('mini_fb/', include('mini_fb.urls')),
     path('voter_analystics/', include('voter_analytics.urls')),
+    path('accounts/', include('circuits.auth_urls')),
+    path('circuits/', include('circuits.urls', namespace='circuits')),
 ]
 
 # enable media file serving in development

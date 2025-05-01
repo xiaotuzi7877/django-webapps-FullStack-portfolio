@@ -23,8 +23,8 @@ urlpatterns = [
     path('profile/update/', UpdateProfileView.as_view(), name='update_profile'),
     path('profile/friend_suggestions/', ShowFriendSuggestionsView.as_view(), name='friend_suggestions'),
     path('profile/news_feed/', ShowNewsFeedView.as_view(), name='news_feed'),
-    path('profile/add_friend/<int:pk>/<int:other_pk>/', AddFriendView.as_view(), name='add_friend'),
-    path('status/create_status/<int:pk>/', CreateStatusMessageView.as_view(), name='create_status'),
+    path('profile/add_friend/<int:other_pk>/', AddFriendView.as_view(), name='add_friend'),
+    path('status/create_status/', CreateStatusMessageView.as_view(), name='create_status'),
     path('profile/my/', ShowMyProfileView.as_view(), name='my_profile'),
 
     # Status message management

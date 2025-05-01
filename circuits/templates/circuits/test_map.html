@@ -1,0 +1,39 @@
+{# Name: Li Ziyang #}
+{# BU Email: miclilzy@bu.edu #}
+{# File Description: A simple test template to verify Leaflet map functionality. #}
+{# Initializes a basic map centered at a specific point and adds one marker. #}
+
+{# Extend the base template (assumes base.html includes Leaflet CSS/JS) #}
+{% extends "circuits/base.html" %}
+
+{# Start main content block #}
+{% block content %}
+  {# Page heading for the test page #}
+  <h2>Leaflet Map Test</h2>
+  
+  {# Container div where the Leaflet map will be rendered #}
+  <div id="map" style="height: 500px;"></div> {# Height must be set #}
+
+  {# Inline script for map initialization and testing #}
+  <script>
+    // Initialize the map, targeting the 'map' div.
+    // setView([latitude, longitude], zoomLevel)
+
+    const map = L.map('map').setView([51.505, -0.09], 4);  
+
+    // Add the OpenStreetMap tile layer to the map.
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors' // Required attribution
+    }).addTo(map); // Add the layer to the map instance
+
+    // Example: adding a marker (Monza)
+    L.marker([45.6156, 9.2811]) // Create a marker at Monza's coordinates
+      .addTo(map) // Add the marker to the map
+      .bindPopup('Autodromo Nazionale Monza') // Add a popup that appears on click
+      .openPopup(); // Open the popup immediately on load
+  </script>
+  {# End inline script #}
+  
+{% endblock content %}
+{# End main content block #}

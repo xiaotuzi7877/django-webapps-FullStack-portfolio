@@ -1,0 +1,57 @@
+{# Name: Li Ziyang #}
+{# BU Email: miclilzy@bu.edu #}
+{# File Description: Template for displaying the F1 quiz leaderboard. #}
+{# Shows a ranked list of top quiz attempts based on score and time. #}
+
+{# Extend the base template #}
+{% extends "circuits/base.html" %}
+{# Load static files tag library (though not strictly needed here, good practice) #}
+{% load static %}
+
+{# Set the page title #}
+{% block title %}Leaderboard - F1 Explorer{% endblock %}
+
+{# Start main content block #}
+{% block content %}
+  {# Page heading #}
+  <h1>Leaderboard</h1>
+
+  {# Table to display the leaderboard rankings #}
+  <table class="leaderboard-table"> {# Apply custom styling if needed via this class #}
+    {# Table header row defining the columns #}
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>User</th>
+        <th>Score</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    {# Table body containing the attempt data #}
+    <tbody>
+      {# Loop through the quiz attempts passed from the view context ('attempts') #}
+      {% for attempt in attempts %}
+        {# Table row for each attempt #}
+        <tr>
+          {# Display the rank using the loop counter (starts at 1) #}
+          <td>{{ forloop.counter }}</td>
+          {# Display the username of the user who made the attempt #}
+          <td>{{ attempt.user.username }}</td>
+          {# Display the score achieved in the attempt #}
+          <td>{{ attempt.score }}</td>
+          {# Display the date and time the attempt was completed, formatted #}
+          <td>{{ attempt.end_time|date:"Y-m-d H:i" }}</td>
+        </tr>
+      {# Message displayed if there are no attempts in the leaderboard yet #}
+      {% empty %}
+        <tr>
+          {# Span the message across all columns #}
+          <td colspan="4" class="text-muted">No attempts yet. Take the quiz to get on the board!</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    {# End table body #}
+  </table>
+  {# End leaderboard table #}
+{% endblock content %}
+{# End main content block #}

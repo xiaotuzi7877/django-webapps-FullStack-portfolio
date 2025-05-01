@@ -1,0 +1,38 @@
+{# Name: Li Ziyang #}
+{# BU Email: miclilzy@bu.edu #}
+{# File Description: Template displayed to confirm the deletion of a specific comment. #}
+{# Shows the comment text and provides "Yes, delete" and "Cancel" options. #}
+
+{# Extend the base template #}
+{% extends "circuits/base.html" %}
+
+{# Set the page title #}
+{% block title %}Delete Comment - F1 Explorer{% endblock %}
+
+{# Start main content block #}
+{% block content %}
+  {# Page heading #}
+  <h1>Delete Comment</h1>
+  
+  {# Confirmation prompt #}
+  <p>Are you sure you want to delete this comment?</p>
+  
+  {# Display the text of the comment to be deleted (object is the Comment instance from the view) #}
+  <blockquote class="border-start ps-3 mb-3">
+    {{ object.text }}
+  </blockquote>
+  
+  {# Form to perform the actual deletion via POST request #}
+  <form method="post" class="d-inline"> {# d-inline keeps button and link on same line #}
+    {% csrf_token %} {# Include CSRF token for security #}
+    {# Confirmation button to submit the deletion request #}
+    <button type="submit" class="btn btn-danger">Yes, delete</button>
+  </form>
+  
+  {# Cancel link - returns the user to the circuit detail page without deleting #}
+  <a
+    href="{% url 'circuits:circuit_detail' object.circuit.pk %}" {# Link uses the comment's related circuit pk #}
+    class="btn btn-secondary ms-2" {# Add some margin to the left #}
+  >Cancel</a>
+{% endblock content %}
+{# End main content block #}

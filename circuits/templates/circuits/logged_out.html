@@ -1,0 +1,21 @@
+{# Name: Li Ziyang #}
+{# BU Email: miclilzy@bu.edu #}
+{# File Description: Template displayed after a user successfully logs out. #}
+{# Confirms logout and provides a link to log back in. #}
+
+{# Extend the base template #}
+{% extends "circuits/base.html" %}
+
+{# Set the page title #}
+{% block title %}Logged Out - F1 Explorer{% endblock %}
+
+{# Start main content block #}
+{% block content %}
+  {# Page heading confirming logout status #}
+  <h2>Logged Out</h2>
+  {# Message confirming successful logout #}
+  <p>You have been successfully logged out.</p>
+  {# Link to navigate back to the login page #}
+  <p><a href="{% url 'login' %}">Log back in</a></p>
+{% endblock content %}
+{# End main content block #}

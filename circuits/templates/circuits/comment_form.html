@@ -1,0 +1,35 @@
+{# Name: Li Ziyang #}
+{# BU Email: miclilzy@bu.edu #}
+{# File Description: Template displaying a form to edit an existing comment. #}
+{# Uses the CommentForm defined in forms.py. #}
+
+{# Extend the base template #}
+{% extends "circuits/base.html" %}
+
+{# Set the page title (Specific to editing) #}
+{% block title %}Edit Comment - F1 Explorer{% endblock %}
+
+{# Start main content block #}
+{% block content %}
+  {# Page heading #}
+  <h1>Edit Your Comment</h1>
+  
+  {# Form for submitting comment edits via POST request #}
+  <form method="post">
+    {% csrf_token %} {# Include CSRF token for security #}
+    
+    {# Render the form fields provided by the 'form' context variable (likely CommentForm). #}
+    {# '.as_p' renders each form field wrapped in a <p> tag. #}
+    {{ form.as_p }} 
+    
+    {# Submit button to save the changes made to the comment #}
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    
+    {# Cancel link - returns the user to the circuit detail page without saving changes #}
+    <a
+      href="{% url 'circuits:circuit_detail' object.circuit.pk %}" {# Link uses the comment's related circuit pk ('object' is the comment instance) #}
+      class="btn btn-secondary ms-2" {# Add some margin to the left #}
+    >Cancel</a>
+  </form>
+{% endblock content %}
+{# End main content block #}

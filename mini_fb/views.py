@@ -331,3 +331,22 @@ class ShowNewsFeedView(LoginRequiredMixin, DetailView):
 class LogoutConfirmationView(TemplateView):
     """Render the logout confirmation page."""
     template_name = "mini_fb/logged_out.html"
+
+class AddFriendView(View):
+    def dispatch(self, request, *args, **kwargs):
+        # 获取当前用户的 Profile
+        user_profile = get_object_or_404(Profile, user=request.user)
+        # 在此处可以添加进一步判断：例如是否允许添加好友等
+        
+        # 将当前用户的 Profile 放入 self 中，供后续使用
+        self.profile = user_profile
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        # 从 URL 中获取要添加好友的 Profile 的 ID
+        other_pk = kwargs.get('other_pk')
+        # 注意：直接用当前用户的 Profile 执行添加好友操作
+        # 假设你在 Profile 模型中已经定义了 add_friend 方法
+        target_profile = get_object_or_404(Profile, pk=other_pk)
+        self.profile.add_friend(target_profile)
+        return redirect('show_profile')
