@@ -4,10 +4,10 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
-pillow = "*"
+django = "~=3.2.25"
+django-import-export = "~=3.3.0"
 
 [dev-packages]
 
 [requires]
-python_version = "3.12"
+python_version = "3.9"
