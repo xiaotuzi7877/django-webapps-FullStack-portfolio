@@ -1,0 +1,40 @@
+{# circuits/templates/circuits/laptime_form.html #}
+{% extends "circuits/base.html" %}
+
+{% block title %}Edit Lap Time - F1 Explorer{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+      <div class="row justify-content-center">
+          <div class="col-md-8 col-lg-6">
+              <h1 class="mb-4">Edit Your Lap Time</h1>
+              <p class="text-muted">Circuit: {{ object.circuit.name }}</p> {# Show which circuit #}
+
+              <form method="post" class="card p-4 shadow-sm">
+                  {% csrf_token %} {# Security token #}
+
+                  {# Display form fields (car dropdown, lap_time input) #}
+                  {# You can use form.as_p or render manually #}
+                  <div class="mb-3">
+                      <label for="{{ form.car.id_for_label }}" class="form-label">{{ form.car.label }}</label>
+                      {{ form.car }}
+                      {% if form.car.errors %}<div class="text-danger mt-1"><small>{{ form.car.errors|striptags }}</small></div>{% endif %}
+                  </div>
+                   <div class="mb-3">
+                      <label for="{{ form.lap_time.id_for_label }}" class="form-label">{{ form.lap_time.label }}</label>
+                      {{ form.lap_time }}
+                       {% if form.lap_time.help_text %}<small class="form-text text-muted d-block">{{ form.lap_time.help_text }}</small>{% endif %}
+                      {% if form.lap_time.errors %}<div class="text-danger mt-1"><small>{{ form.lap_time.errors|striptags }}</small></div>{% endif %}
+                  </div>
+
+                  {# Buttons #}
+                  <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-3">
+                      <button type="submit" class="btn btn-primary">Save Changes</button>
+                      {# Cancel button links back to the circuit detail page #}
+                      <a href="{% url 'circuits:circuit_detail' object.circuit.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+{% endblock content %}

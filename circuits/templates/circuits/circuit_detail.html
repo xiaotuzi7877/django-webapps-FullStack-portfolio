@@ -1,12 +1,13 @@
 {# Name: Li Ziyang #}
 {# BU Email: miclilzy@bu.edu #}
 {# File Description: Template for displaying the detailed information of a single F1 circuit, #}
-{# including its stats, introduction, fun facts, and a section for viewing and adding comments. #}
+{# including its stats, introduction, fun facts, average rating, most wins driver, #}
+{# and sections for viewing/adding comments and user lap times. #}
 
 {# Extend the base template to inherit common structure and styles #}
 {% extends "circuits/base.html" %}
-{# Load static files tag library #}
-{% load static %}
+{# Load necessary tag libraries #}
+{% load static i18n %}
 
 {# Set the page title specific to this circuit #}
 {% block title %}{{ circuit.name }} - F1 Explorer{% endblock %}
@@ -26,7 +27,7 @@
     <div class="circuit-detail__image">
       <img src="{{ circuit.layout_image.url }}" alt="{{ circuit.name }} layout">
     </div>
-    {# Circuit introduction text section #}
+    {# Circuit introduction text section - Removed 'detail-section' class #}
     <div class="circuit-detail__intro">
       <h2>Introduction</h2>
       <p>{{ circuit.introduction }}</p>
@@ -39,121 +40,219 @@
     {# Stat card for First Grand Prix year #}
     <div class="stat-card">
       <h4>First Grand Prix</h4>
-      <p class="stat-value">{{ circuit.first_grand_prix }}</p>
+      <p class="stat-value">{{ circuit.first_grand_prix|default:"N/A" }}</p>
     </div>
     {# Stat card for Number of Laps #}
     <div class="stat-card">
       <h4>Number of Laps</h4>
-      <p class="stat-value">{{ circuit.number_of_laps }}</p>
+      <p class="stat-value">{{ circuit.number_of_laps|default:"N/A" }}</p>
     </div>
     {# Stat card for Circuit Length #}
     <div class="stat-card">
       <h4>Circuit Length</h4>
-      <p class="stat-value">{{ circuit.circuit_length }} km</p>
+      <p class="stat-value">{{ circuit.circuit_length|default:"N/A" }} km</p>
     </div>
     {# Stat card for Race Distance #}
     <div class="stat-card">
       <h4>Race Distance</h4>
-      <p class="stat-value">{{ circuit.race_distance }} km</p>
+      <p class="stat-value">{{ circuit.race_distance|default:"N/A" }} km</p>
     </div>
+
+    {# --- Average Rating Card --- #}
+    <div class="stat-card">
+        <h4>Average Rating</h4>
+        {% with avg_rating=circuit.calculate_average_rating %}
+            {% if avg_rating is not None %}
+                <p class="stat-value">{{ avg_rating|floatformat:1 }} ★</p>
+            {% else %}
+                <p class="stat-value text-muted" style="font-size: 1rem; margin-top: 0.75rem;">No ratings yet</p>
+            {% endif %}
+        {% endwith %}
+    </div>
+    {# --- End Average Rating Card --- #}
+
+    {# --- Most Wins Card --- #}
+    <div class="stat-card">
+        <h4>Most Wins (Driver)</h4>
+        {% if circuit.most_wins_driver %}
+            <p class="stat-value" style="margin-bottom: 0.1rem;">{{ circuit.most_wins_driver }}</p>
+            {% if circuit.most_wins_count %}
+                <small class="text-muted">({{ circuit.most_wins_count }} wins)</small>
+            {% endif %}
+        {% else %}
+            <p class="stat-value text-muted" style="font-size: 1rem; margin-top: 0.75rem;">Data unavailable</p>
+        {% endif %}
+    </div>
+    {# --- End Most Wins Card --- #}
+
     {# Wide stat card for Lap Record information #}
     <div class="stat-card stat-card--wide">
       <h4>Lap Record</h4>
-      <p class="stat-value">{{ circuit.record_lap_info }}</p>
+      <p class="stat-value">{{ circuit.record_lap_info|default:"N/A" }}</p>
     </div>
   </div>
+  {# === End Stats Grid === #}
+
 
   {# === Fun Fact Panel === #}
   {# Conditionally display the fun fact section if fun_fact exists #}
   {% if circuit.fun_fact %}
+    {# Apply detail-section class here as it's standalone #}
     <div class="fun-fact-section detail-section">
       <h2><i class="fas fa-lightbulb"></i> Fun Fact</h2> {# Example icon (assuming FontAwesome) #}
       <p>{{ circuit.fun_fact }}</p>
     </div>
   {% endif %}
-  
-  {# Visual separator before the comments section #}
+  {# === End Fun Fact Panel === #}
+
+  {# Visual separator before the comments/lap times section #}
   <hr>
 
-  {# === Comments Section === #}
-  <div class="comments-section">
-    {# Heading for the comments section #}
-    <h3>Comments</h3>
+  {# === Combined Comments & Lap Times Section === #}
+  <div class="comments-lap-times-section">
 
-    {# --- Comment Form Section --- #}
-    {# Display comment form only if the user is authenticated #}
-    {% if user.is_authenticated %}
-      {# Form points to the add_comment view for this circuit #}
-      <form class="comment-form" method="post" action="{% url 'circuits:add_comment' circuit.pk %}">
-        {% csrf_token %} {# Include CSRF token for security #}
-        {# Comment text input field #}
-        <div class="mb-3">
-          <label for="{{ form.text.id_for_label }}">{{ form.text.label }}</label>
-          {{ form.text }} {# Render the textarea widget #}
-        </div>
-        {# Comment rating input field #}
-        <div class="mb-3">
-          <label for="{{ form.rating.id_for_label }}">{{ form.rating.label }}</label>
-          {{ form.rating }} {# Render the select widget #}
-          {# Display help text for the rating field if available #}
-          {% if form.rating.help_text %}
-            <small class="form-text text-muted">{{ form.rating.help_text }}</small>
-          {% endif %}
-        </div>
-        {# Submit button for the comment form #}
-        <button type="submit" class="btn btn-primary btn-submit-comment">Submit Comment</button>
-      </form>
-    {# If user is not logged in, show a prompt to log in #}
-    {% else %}
-      <p class="text-muted">
-        Please <a href="{% url 'login' %}">log in</a> to leave a comment.
-      </p>
-    {% endif %}
-    {# --- End Comment Form Section --- #}
+    <h3>Community Contributions</h3> {# Overall heading for this combined section #}
 
-    {# --- Display Existing Comments --- #}
-    {# Loop through all comments related to this circuit #}
-    {% for comment in circuit.comments.all %}
-      {# Card container for displaying a single comment #}
-      <div class="comment-card mb-3">
-        <div class="comment-card-body">
-          {# Comment metadata: Author username and creation timestamp #}
-          <div class="meta">
-            <strong>{{ comment.user.username }}</strong>
-            <small>{{ comment.created_at|date:"Y-m-d H:i" }}</small> {# Format the date/time #}
+    {# Display Django messages (e.g., success/error after form submission) #}
+    {% if messages %}
+      <div class="messages mb-3">
+        {% for message in messages %}
+          <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> {# Optional: Add dismiss button if using Bootstrap 5 #}
           </div>
-          {# The actual text content of the comment #}
-          <p class="text">{{ comment.text }}</p>
-          {# The rating given by the user #}
-          <p class="rating">Rating: {{ comment.rating }} ★</p> {# Display rating with a star symbol #}
-
-          {# --- Comment Actions (Edit/Delete) --- #}
-          {# Show edit/delete buttons only if the current user is the comment author #}
-          {% if comment.user == user %}
-            <div class="actions">
-              {# Link to the comment update view #}
-              <a
-                href="{% url 'circuits:comment_update' comment.pk %}"
-                class="btn btn-edit" {# Apply custom styling #}
-              >Edit</a>
-              {# Link to the comment delete view #}
-              <a
-                href="{% url 'circuits:comment_delete' comment.pk %}"
-                class="btn btn-delete" {# Apply custom styling #}
-              >Delete</a>
-            </div>
-          {% endif %}
-          {# --- End Comment Actions --- #}
-        </div>
+        {% endfor %}
       </div>
-    {# If there are no comments for this circuit #}
-    {% empty %}
-      <p class="text-muted">
-        No comments yet. Be the first to share your thoughts!
-      </p>
-    {% endfor %}
-    {# --- End Display Existing Comments --- #}
-  </div>
-  {# === End Comments Section === #}
+    {% endif %}
+
+    {# --- Forms Side-by-Side (using Bootstrap Grid) --- #}
+    <div class="row mb-4"> {# Add margin below the forms row #}
+      <div class="col-md-6"> {# Column for Comment Form #}
+        <h4>Leave a Comment & Rating</h4>
+        {% if user.is_authenticated %}
+          <form class="comment-form card p-3 shadow-sm" method="post" action="{% url 'circuits:add_comment' circuit.pk %}"> {# Added card styles #}
+            {% csrf_token %}
+            <div class="mb-3">
+              {# Assuming view passes comment form as 'comment_form' #}
+              <label for="{{ comment_form.text.id_for_label }}">{{ comment_form.text.label }}</label>
+              {{ comment_form.text }}
+            </div>
+            <div class="mb-3">
+              <label for="{{ comment_form.rating.id_for_label }}">{{ comment_form.rating.label }}</label>
+              {{ comment_form.rating }}
+              {% if comment_form.rating.help_text %}
+                <small class="form-text text-muted">{{ comment_form.rating.help_text }}</small>
+              {% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary btn-submit-comment">Submit Comment</button>
+          </form>
+        {% else %}
+          <p class="text-muted">Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a> to leave a comment.</p>
+        {% endif %}
+      </div> {# End Comment Form Column #}
+
+      <div class="col-md-6"> {# Column for Lap Time Form #}
+        <h4>Add Your F1 2024 Lap Time</h4>
+        {% if user.is_authenticated %}
+          {# Form points to the new add_lap_time view #}
+          <form class="lap-time-form card p-3 shadow-sm" method="post" action="{% url 'circuits:add_lap_time' circuit.pk %}"> {# Added card styles #}
+            {% csrf_token %}
+            <div class="mb-3">
+              {# Assuming view passes lap time form as 'lap_time_form' #}
+              <label for="{{ lap_time_form.car.id_for_label }}">{{ lap_time_form.car.label }}</label>
+              {{ lap_time_form.car }}
+              {# Display potential form errors for car field #}
+              {% if lap_time_form.car.errors %}
+                <div class="text-danger mt-1">
+                    {% for error in lap_time_form.car.errors %}
+                        <small>{{ error }}</small><br>
+                    {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            <div class="mb-3">
+              <label for="{{ lap_time_form.lap_time.id_for_label }}">{{ lap_time_form.lap_time.label }}</label>
+              {{ lap_time_form.lap_time }}
+               {% if lap_time_form.lap_time.help_text %}
+                <small class="form-text text-muted">{{ lap_time_form.lap_time.help_text }}</small>
+              {% endif %}
+               {# Display potential form errors for lap_time field #}
+               {% if lap_time_form.lap_time.errors %}
+                   <div class="text-danger mt-1">
+                       {% for error in lap_time_form.lap_time.errors %}
+                           <small>{{ error }}</small><br>
+                       {% endfor %}
+                   </div>
+               {% endif %}
+            </div>
+            <button type="submit" class="btn btn-success btn-submit-laptime">Submit Lap Time</button>
+          </form>
+        {% else %}
+          <p class="text-muted">Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a> to add your lap time.</p>
+        {% endif %}
+      </div> {# End Lap Time Form Column #}
+    </div>{# End row for forms #}
+
+
+    {# --- Display Existing Data Side-by-Side --- #}
+    <div class="row">
+        <div class="col-md-6 mb-4 mb-md-0"> {# Column for Existing Comments #}
+            <h4>User Comments</h4>
+             {# Assuming view passes comments list as 'comments' #}
+            {% for comment in comments %}
+              <div class="comment-card card mb-3 shadow-sm"> {# Added card styles #}
+                 <div class="comment-card-body card-body"> {# Added card-body #}
+                  <div class="meta">
+                    <strong>{{ comment.user.username }}</strong>
+                    <small class="text-muted">{{ comment.created_at|date:"Y-m-d H:i" }}</small>
+                  </div>
+                  <p class="text mb-1 fst-italic">"{{ comment.text }}"</p> {# Adjusted styles #}
+                  <p class="rating mb-1">Rating: {{ comment.rating }} ★</p> {# Adjusted styles #}
+                  {# Conditional Edit/Delete Buttons for Comments #}
+                  {% if comment.user == request.user %}
+                    <div class="actions mt-1"> {# Adjusted styles #}
+                      <a href="{% url 'circuits:comment_update' comment.pk %}" class="btn btn-sm btn-outline-secondary py-0 px-1 me-1">Edit</a>
+                      <a href="{% url 'circuits:comment_delete' comment.pk %}" class="btn btn-sm btn-outline-danger py-0 px-1">Delete</a>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            {% empty %}
+              <p class="text-muted">No comments yet.</p>
+            {% endfor %}
+        </div> {# End Comments Display Column #}
+
+        <div class="col-md-6"> {# Column for Existing Lap Times #}
+            <h4>User Lap Times (F1 2024)</h4>
+             {# Assuming view passes lap times list as 'lap_times', ordered appropriately #}
+             {% for entry in lap_times %}
+               <div class="lap-time-entry-card card mb-3 shadow-sm"> {# Added card styles #}
+                 <div class="lap-time-entry-body card-body"> {# Added card-body #}
+                   <div class="meta">
+                     <strong>{{ entry.user.username }}</strong>
+                     <small class="text-muted">{{ entry.created_at|date:"Y-m-d H:i" }}</small>
+                   </div>
+                   <p class="lap-time-value fs-5"><strong>{{ entry.lap_time }}</strong></p>
+                   <p class="car-info text-muted mb-1"><small>Car: {{ entry.car }}</small></p>
+
+                   {# --- ADDED: Conditional Edit/Delete Buttons for Lap Times --- #}
+                   {% if entry.user == request.user %}
+                       <div class="actions mt-2">
+                           <a href="{% url 'circuits:laptime_update' entry.pk %}" class="btn btn-sm btn-outline-secondary py-0 px-1 me-1">Edit</a>
+                           <a href="{% url 'circuits:laptime_delete' entry.pk %}" class="btn btn-sm btn-outline-danger py-0 px-1">Delete</a>
+                       </div>
+                   {% endif %}
+                   {# --- END ADDED --- #}
+
+                 </div>
+               </div>
+             {% empty %}
+               <p class="text-muted">No lap times submitted yet.</p>
+             {% endfor %}
+        </div> {# End Lap Times Display Column #}
+    </div> {# End row for displaying data #}
+
+  </div> {# End comments-lap-times-section #}
+
 {% endblock content %}
 {# End of the main content block #}

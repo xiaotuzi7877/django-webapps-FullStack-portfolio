@@ -29,9 +29,8 @@
     </thead>
     {# Table body containing the attempt data #}
     <tbody>
-      {# Loop through the quiz attempts passed from the view context ('attempts') #}
       {% for attempt in attempts %}
-        {# Table row for each attempt #}
+      {# Loop through the quiz attempts passed from the view context ('attempts') #}        {# Table row for each attempt #}
         <tr>
           {# Display the rank using the loop counter (starts at 1) #}
           <td>{{ forloop.counter }}</td>
@@ -55,3 +54,4 @@
   {# End leaderboard table #}
 {% endblock content %}
 {# End main content block #}
+</html>

@@ -20,9 +20,7 @@ class Profile(models.Model):
     # URL string for the user's profile image (maximum length: 50 characters)
     profile_image_url = models.CharField(max_length=50)
     # link profile to Django User
-    user = models.ForeignKey(User, on_delete = models.CASCADE, null = True)
-
-
+    user = models.ForeignKey(User, on_delete = models.CASCADE, null = True, related_name='mini_fb_profile')
 
     # returns a readable representation of the profile).
     def __str__(self):
@@ -103,6 +101,9 @@ class Profile(models.Model):
         ).order_by('-timestamp')  # Most recent first
 
         return status_messages
+    
+    def __str__(self):
+        return self.user.username
     
     
     

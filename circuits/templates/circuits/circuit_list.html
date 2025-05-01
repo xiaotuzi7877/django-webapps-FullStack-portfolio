@@ -2,10 +2,12 @@
 {# BU Email: miclilzy@bu.edu #}
 {# File Description: Template for displaying a list of F1 circuits. #}
 {# Includes filtering options (name, continent), an interactive Leaflet map, #}
-{# and a grid of circuit cards linking to detail pages. #}
+{# and a grid of circuit cards linking to detail pages, now also showing average ratings. #}
 
 {# Extend the base template #}
 {% extends "circuits/base.html" %}
+{# Load necessary tags (static is standard, i18n for floatformat) #}
+{% load static i18n %}
 
 {# Set the page title #}
 {% block title %}All Circuits - F1 Explorer{% endblock %}
@@ -82,19 +84,39 @@
           {% endif %}
           {# Card body content #}
           <div class="card-body d-flex flex-column"> {# Use flexbox for button alignment #}
-            <h5 class="card-title">{{ circuit.name }}</h5>
-            <p class="card-text">{{ circuit.location }}</p>
+            
+            {# --- START: Display Name and Average Rating --- #}
+            <div class="d-flex justify-content-between align-items-center mb-1"> {# Use flexbox for alignment, add bottom margin #}
+              <h5 class="card-title mb-0">{{ circuit.name }}</h5> {# Circuit Name #}
+              {# Display average rating if it exists (calculated via view annotation) #}
+              {% if circuit.average_rating is not None %}
+                <span class="circuit-rating badge bg-warning text-dark ms-2"> {# Style as a badge, add left margin #}
+                    {# Format rating to 1 decimal place and add star #}
+                    {{ circuit.average_rating|floatformat:1 }} ★ 
+                </span>
+              {% endif %}
+            </div>
+            {# --- END: Display Name and Average Rating --- #}
+            
+            {# Display circuit location below the name/rating line #}
+            <p class="card-text">{{ circuit.location }}</p> 
+            
             {# Link to the circuit's detail page, aligned to bottom #}
             <a
               href="{% url 'circuits:circuit_detail' circuit.pk %}"
               class="btn btn-primary mt-auto" {# mt-auto pushes button to bottom #}
             >View Details</a>
           </div>
+          {# End Card body content #}
         </div>
+        {# End Card container #}
       </div>
+      {# End Bootstrap column #}
     {# Message displayed if the circuits list is empty (e.g., no search results) #}
     {% empty %}
-      <p>No circuits found matching your criteria.</p>
+      <div class="col"> {# Ensure message takes up column space #}
+        <p>No circuits found matching your criteria.</p>
+      </div>
     {% endfor %}
   </div>
   {# End Circuit Cards Grid #}

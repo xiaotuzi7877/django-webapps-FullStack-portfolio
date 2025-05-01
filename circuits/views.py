@@ -1,12 +1,12 @@
 # Name: Li Ziyang
 # BU Email: miclilzy@bu.edu
-# File Description: Defines the view functions and classes for the 'circuits' 
+# File Description: Defines the view functions and classes for the 'circuits'
 # application, handling HTTP requests and rendering responses.
 
 import json
 import random
 from datetime import datetime
-
+from django.db.models import Avg
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -19,22 +19,26 @@ from django.views.generic import (
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth import login as auth_login
+from django.contrib import messages
 
+# --- Model and Form Imports ---
+# Consolidate imports and add User
+from django.contrib.auth.models import User
 from .models import (
-    Circuit,
-    Question,
-    Choice,
-    QuizAttempt,
-    Answer,
-    Comment,
+    Circuit, Comment, LapTimeEntry, Profile, # Added Profile
+    Question, Choice, QuizAttempt, Answer,
     CONTINENT_CHOICES,
 )
-from .forms import CommentForm, SignUpForm
+# *** Import ProfileForm ***
+from .forms import CommentForm, LapTimeForm, SignUpForm, ProfileForm # <-- Added ProfileForm
 
+# ==============================================
+# Circuit List and Detail Views
+# ==============================================
 
 class CircuitListView(ListView):
     """
-    Displays a list of F1 circuits. Supports filtering by name via a 'q' 
+    Displays a list of F1 circuits. Supports filtering by name via a 'q'
     query parameter and by continent via a 'continent' query parameter.
     Also prepares JSON data for the map display.
     """
@@ -43,39 +47,27 @@ class CircuitListView(ListView):
     context_object_name = 'circuits'
 
     def get_queryset(self):
-        """
-        Filters the base queryset based on 'q' (name search) and 'continent' 
-        GET parameters.
-
-        Returns:
-            QuerySet: The potentially filtered QuerySet of Circuits.
-        """
+        """Optionally filter circuits and annotate with average rating."""
         qs = super().get_queryset()
         q = self.request.GET.get('q', '').strip()
         continent = self.request.GET.get('continent')
-        
-        # Apply name filter if 'q' parameter is present
         if q:
             qs = qs.filter(name__icontains=q)
-        # Apply continent filter if 'continent' parameter is present
         if continent:
             qs = qs.filter(continent=continent)
-            
+
+        # Annotate each circuit with its average comment rating
+        qs = qs.annotate(average_rating=Avg('comments__rating'))
+
         return qs
 
     def get_context_data(self, **kwargs):
         """
-        Adds search parameters, continent choices for dropdown, and JSON data 
+        Adds search parameters, continent choices for dropdown, and JSON data
         for Leaflet map markers to the context.
-
-        Args:
-            **kwargs: Additional keyword arguments from the view.
-
-        Returns:
-            dict: The context dictionary for rendering the template.
         """
         context = super().get_context_data(**kwargs)
-        
+
         # Pass search/filter parameters back to template for display
         context['q'] = self.request.GET.get('q', '')
         context['selected_continent'] = self.request.GET.get('continent', '')
@@ -85,303 +77,386 @@ class CircuitListView(ListView):
 
         # Prepare data structure for Leaflet map markers
         map_data = []
-        # Iterate over the filtered circuits included in the current context
-        for circuit in context['circuits']: 
+        for circuit in context['circuits']:
             map_data.append({
                 'name': circuit.name,
                 'lat': circuit.latitude,
                 'lng': circuit.longitude,
                 'url': reverse('circuits:circuit_detail', args=[circuit.pk]),
             })
-        # Convert the list of dictionaries to a JSON string for the template
         context['circuits_data_json'] = json.dumps(map_data)
 
         return context
 
+# Using Function-Based View for detail as it handles more complex context
+def circuit_detail(request, pk):
+    """Displays detailed information and forms for a circuit. (FBV version)"""
+    circuit = get_object_or_404(Circuit, pk=pk)
+    comments = circuit.comments.all().order_by('-created_at') # Fetch comments
+    lap_times = circuit.lap_times.all().order_by('lap_time')   # Fetch lap times
 
-class CircuitDetailView(DetailView):
-    """Displays detailed information for a single circuit."""
-    model = Circuit
-    template_name = 'circuits/circuit_detail.html'
-    context_object_name = 'circuit'
+    # Initialize forms for display on the detail page
+    comment_form = CommentForm()
+    lap_time_form = LapTimeForm()
 
-    def get_context_data(self, **kwargs):
-        """
-        Adds an empty CommentForm instance to the context for comment submission.
+    context = {
+        'circuit': circuit,
+        'comment_form': comment_form, # Form for adding comments
+        'lap_time_form': lap_time_form, # Form for adding lap times
+        'lap_times': lap_times,         # Existing lap times list
+        'comments': comments,           # Existing comments list
+    }
+    return render(request, 'circuits/circuit_detail.html', context)
 
-        Args:
-            **kwargs: Additional keyword arguments from the view.
 
-        Returns:
-            dict: The context dictionary including the comment form.
-        """
-        context = super().get_context_data(**kwargs)
-        # Initialize an empty form for adding new comments
-        context['form'] = CommentForm()  
-        return context
-
+# ==============================================
+# Comment Views
+# ==============================================
 
 @login_required
 def add_comment(request, pk):
-    """
-    Handles the submission of a new comment via POST request for a specific circuit.
-    Requires user to be logged in.
-
-    Args:
-        request: The HttpRequest object.
-        pk (int): The primary key of the Circuit being commented on.
-
-    Returns:
-        HttpResponseRedirect: Redirects back to the circuit detail page 
-                              after processing the comment.
-    """
+    """Handles adding a new comment to a specific circuit via POST."""
     circuit = get_object_or_404(Circuit, pk=pk)
-    # Process submitted form data if request is POST, otherwise create empty form
-    form = CommentForm(request.POST or None)  
-    if request.method == 'POST' and form.is_valid():
-        comment = form.save(commit=False) # Create Comment object but don't save yet
-        comment.user = request.user       # Assign the logged-in user
-        comment.circuit = circuit       # Assign the relevant circuit
-        comment.save()                    # Save the complete comment object
-        # Redirect to the same circuit detail page to see the new comment
-        return redirect('circuits:circuit_detail', pk=pk) 
-    
-    # If GET or form invalid, redirect back (or handle differently if needed)
-    # Typically, invalid POST would re-render detail with errors, but this
-    # simplifies by always redirecting. Consider enhancing error handling.
-    return redirect('circuits:circuit_detail', pk=pk)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.user = request.user
+            comment.circuit = circuit
+            comment.save()
+            messages.success(request, 'Comment added successfully!')
+            return redirect('circuits:circuit_detail', pk=pk)
+        else:
+            # Re-render detail page showing comment form errors
+            messages.error(request, 'Error adding comment. Please check the form.')
+            # Fetch other context needed for detail page
+            lap_times = circuit.lap_times.all().order_by('lap_time')
+            lap_time_form = LapTimeForm()
+            comments = circuit.comments.all().order_by('-created_at')
+            context = {
+                'circuit': circuit,
+                'comment_form': form, # Pass the invalid form back
+                'lap_time_form': lap_time_form,
+                'lap_times': lap_times,
+                'comments': comments,
+            }
+            return render(request, 'circuits/circuit_detail.html', context)
+    else:
+        # If GET request, redirect back to detail page (form is shown there)
+        return redirect('circuits:circuit_detail', pk=pk)
 
+
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """Allows a logged-in user to update their own existing comment."""
+    model = Comment
+    form_class = CommentForm
+    template_name = 'circuits/comment_form.html' # Template for editing
+
+    def get_success_url(self):
+        """Redirects to the circuit detail page after successful update."""
+        messages.success(self.request, 'Comment updated successfully!')
+        return reverse_lazy('circuits:circuit_detail', args=[self.object.circuit.pk])
+
+    def test_func(self):
+        """Ensures only the comment author can edit."""
+        comment = self.get_object()
+        return self.request.user == comment.user
+
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """Allows a logged-in user to delete their own existing comment."""
+    model = Comment
+    template_name = 'circuits/comment_confirm_delete.html' # Confirmation page
+
+    def get_success_url(self):
+        """Redirects to the circuit detail page after successful deletion."""
+        messages.success(self.request, 'Comment deleted successfully!')
+        return reverse_lazy('circuits:circuit_detail', args=[self.object.circuit.pk])
+
+    def test_func(self):
+        """Ensures only the comment author can delete."""
+        comment = self.get_object()
+        return self.request.user == comment.user
+
+
+# ==============================================
+# Lap Time Views
+# ==============================================
+
+@login_required
+def add_lap_time(request, circuit_pk):
+    """Handles adding a new lap time entry for a specific circuit via POST."""
+    circuit = get_object_or_404(Circuit, pk=circuit_pk)
+    lap_time_form = LapTimeForm(request.POST or None) # Initialize form
+
+    if request.method == 'POST':
+        if lap_time_form.is_valid():
+            try:
+                lap_time_entry = lap_time_form.save(commit=False)
+                lap_time_entry.user = request.user
+                lap_time_entry.circuit = circuit
+                lap_time_entry.save()
+                messages.success(request, 'Your lap time has been added!')
+                return redirect('circuits:circuit_detail', pk=circuit_pk)
+            except Exception as e: # Catch potential integrity errors etc.
+                messages.error(request, f'Error saving lap time: {e}')
+                # Fall through to re-render the page with the error
+        else:
+            # Form is invalid, add error message
+            messages.error(request, 'Invalid lap time data. Please check your input.')
+            # Fall through to re-render the page with the invalid form
+
+    # --- Re-render detail page on GET or failed POST ---
+    comments = circuit.comments.all().order_by('-created_at')
+    lap_times = circuit.lap_times.all().order_by('lap_time')
+    comment_form = CommentForm() # Need a fresh comment form
+
+    # lap_time_form will be empty on GET, or contain errors on failed POST
+    context = {
+        'circuit': circuit,
+        'comment_form': comment_form,
+        'lap_time_form': lap_time_form, # Pass the potentially invalid form back
+        'lap_times': lap_times,
+        'comments': comments,
+    }
+    return render(request, 'circuits/circuit_detail.html', context)
+
+
+# ==============================================
+# Quiz Views
+# ==============================================
 
 @login_required
 def quiz_view(request):
-    """
-    Renders the quiz page (GET) or processes the submitted quiz answers (POST).
-    Requires user to be logged in.
-
-    On GET: Displays a set of randomly selected questions.
-    On POST: Grades the submitted answers, creates QuizAttempt and Answer
-             records, and redirects to the leaderboard.
-
-    Args:
-        request: The HttpRequest object.
-
-    Returns:
-        HttpResponse: Renders the quiz template (GET) or redirects to the 
-                      leaderboard (POST).
-    """
+    """Renders the quiz page (GET) or processes submitted answers (POST)."""
     if request.method == 'POST':
         # --- Process submitted quiz ---
-        # Retrieve start time from hidden form field
         start_time_str = request.POST.get('start_time')
         try:
             start_time = datetime.fromisoformat(start_time_str)
         except (ValueError, TypeError):
-            # Handle error: invalid start time format - potentially redirect back with error
-            # For simplicity, redirecting to leaderboard for now.
-            return redirect('circuits:leaderboard') 
-        
+            messages.error(request, "Invalid quiz start time.")
+            return redirect('circuits:quiz') # Redirect back to quiz start
+
         end_time = timezone.now()
-        
-        # Create the initial attempt record (score will be updated later)
+
         attempt = QuizAttempt.objects.create(
-            user=request.user,
-            start_time=start_time,
-            end_time=end_time,
-            score=0 # Initialize score to 0
+            user=request.user, start_time=start_time, end_time=end_time, score=0
         )
-        
+
         score = 0
-        # Get the list of question IDs that were presented in the quiz
         question_ids = request.POST.getlist('question_ids')
+        # Ensure questions exist and handle potential errors
         questions = Question.objects.filter(id__in=question_ids)
-        
-        # Iterate through presented questions to grade submitted answers
+        if len(question_ids) != questions.count():
+             messages.error(request, "Error processing quiz questions.")
+             attempt.delete() # Clean up incomplete attempt
+             return redirect('circuits:quiz')
+
         for q in questions:
-            # Get the selected choice ID for this question from the POST data
             choice_id = request.POST.get(f'question_{q.id}')
             is_correct_answer = False
             selected_choice = None
-            
+
             if choice_id:
                 try:
-                    # Retrieve the Choice object corresponding to the submitted ID
-                    choice = Choice.objects.get(id=int(choice_id))
-                    selected_choice = choice
-                    # Check if the selected choice belongs to the current question 
-                    # and if it's marked as correct
-                    if choice.question == q and choice.is_correct:
-                        score += 1 # Increment score for correct answer
-                        is_correct_answer = True
+                    choice = Choice.objects.select_related('question').get(id=int(choice_id))
+                    # Verify choice belongs to the question being processed
+                    if choice.question == q:
+                        selected_choice = choice
+                        if choice.is_correct:
+                            score += 1
+                            is_correct_answer = True
+                    else:
+                        # Handle case where submitted choice_id doesn't match question
+                         messages.warning(request, f"Submitted choice for question '{q.text}' was invalid.")
                 except (Choice.DoesNotExist, ValueError):
-                    # Handle cases where choice_id is invalid or doesn't exist
-                    pass 
-            
-            # Record the user's answer (or lack thereof) for this question
+                     messages.warning(request, f"Invalid choice submitted for question '{q.text}'.")
+
+            # Record the answer
             Answer.objects.create(
-                attempt=attempt,
-                question=q,
-                selected_choice=selected_choice, # Can be None if no answer submitted
-                is_correct=is_correct_answer
+                attempt=attempt, question=q,
+                selected_choice=selected_choice, is_correct=is_correct_answer
             )
-            
-        # Update the attempt record with the final calculated score
+
         attempt.score = score
         attempt.save()
-        
-        # Redirect user to the leaderboard to see their ranking
+        messages.success(request, f"Quiz submitted! Your score: {score}")
         return redirect('circuits:leaderboard')
 
     # --- Handle GET request: Prepare and render the quiz ---
     all_questions = list(Question.objects.all())
-    # Randomly select 6 questions, or fewer if not enough questions exist
-    num_questions_to_sample = min(len(all_questions), 6) 
+    num_questions_to_sample = min(len(all_questions), 6)
+    if num_questions_to_sample < 1:
+         messages.warning(request, "No quiz questions available.")
+         # Maybe redirect somewhere else or render template with message
+         return render(request, 'circuits/quiz.html', {'questions': []})
+
     sampled_questions = random.sample(all_questions, num_questions_to_sample)
-    
+
     context = {
         'questions': sampled_questions,
-        # Pass question IDs to the template for inclusion in the form
-        'question_ids': [q.id for q in sampled_questions], 
-         # Pass current time for recording the quiz start time in the form
-        'now': timezone.now().isoformat(), 
+        'question_ids': [q.id for q in sampled_questions],
+        'now': timezone.now().isoformat(),
     }
     return render(request, 'circuits/quiz.html', context)
 
 
 class LeaderboardView(ListView):
-    """Displays top quiz attempts sorted by score descending, time ascending."""
+    """Displays top quiz attempts sorted by score and time."""
     model = QuizAttempt
     template_name = 'circuits/leaderboard.html'
     context_object_name = 'attempts'
+    paginate_by = 20 # Optional: Add pagination
 
     def get_queryset(self):
-        """
-        Returns the top 20 QuizAttempts ordered first by score (highest first)
-        and then by duration (shortest first - using end_time as proxy).
-
-        Returns:
-            QuerySet: The QuerySet of the top 20 QuizAttempts.
-        """
-        # Order by score descending (-score), then end_time ascending 
-        # (assuming attempts started roughly same time, earlier end = faster)
-        return QuizAttempt.objects.order_by('-score', 'end_time')[:20]
+        """Returns top attempts ordered by score (desc) and duration (asc)."""
+        # Select related user for efficiency in template
+        return QuizAttempt.objects.select_related('user').order_by('-score', 'end_time')
 
 
-def test_map_view(request):
-    """
-    Renders a standalone test map page. 
-    (Note: Likely used for development/testing purposes only).
-
-    Args:
-        request: The HttpRequest object.
-
-    Returns:
-        HttpResponse: Renders the 'test_map.html' template.
-    """
-    return render(request, 'circuits/test_map.html')
-
+# ==============================================
+# Authentication and User Profile Views
+# ==============================================
 
 def signup(request):
-    """
-    Handles user registration (signup).
+    """Handles user registration."""
+    if request.user.is_authenticated:
+        return redirect('circuits:circuit_list') # Redirect if already logged in
 
-    On GET: Displays the signup form.
-    On POST: Processes the signup form, creates a new user, logs them in,
-             and redirects to the circuit list page.
-
-    Args:
-        request: The HttpRequest object.
-
-    Returns:
-        HttpResponse: Renders the signup template (GET or invalid POST) or
-                      redirects to circuit list (successful POST).
-    """
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            user = form.save() # Create the new user instance
-            auth_login(request, user) # Log the new user in automatically
-            return redirect('circuits:circuit_list') # Redirect to main page
-    else: # GET request
-        form = SignUpForm() # Create an empty form instance
-        
+            user = form.save()
+            auth_login(request, user) # Log in the new user
+            messages.success(request, 'Signup successful! Welcome.')
+            # Redirect to circuit list or perhaps their new (empty) profile?
+            return redirect('circuits:circuit_list')
+            # Alternatively, redirect to edit profile page after signup:
+            # return redirect('circuits:edit_profile')
+        else:
+             messages.error(request, 'Please correct the errors below.')
+    else:
+        form = SignUpForm()
+
     return render(request, 'circuits/signup.html', {'form': form})
 
 
-class CommentUpdateView(
-    LoginRequiredMixin,  # Ensures user is logged in
-    UserPassesTestMixin, # Ensures user owns the comment
-    UpdateView           # Provides generic update functionality
-):
+@login_required # Ensure user is logged in to edit profile
+def edit_profile(request):
     """
-    Allows a logged-in user to update their own existing comment.
-    Inherits from UpdateView for standard form handling and object loading.
-    Uses mixins for access control.
+    Handles editing the logged-in user's profile (e.g., avatar).
     """
-    model = Comment
-    form_class = CommentForm
-    template_name = 'circuits/comment_form.html' # Reuse the comment form template
+    # Get the Profile instance associated with the current user.
+    # Creates one if it doesn't exist (robustness for edge cases).
+    profile, created = Profile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        # Populate the form with submitted data AND files, bound to the user's profile instance
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save() # Save the changes to the profile (including avatar)
+            messages.success(request, 'Your profile has been updated successfully!')
+            # Redirect to the user's public profile view
+            return redirect('circuits:user_profile', username=request.user.username)
+        else:
+            # Form is invalid, display errors
+            messages.error(request, 'Please correct the errors below.')
+            # The invalid form (with errors) will be rendered below
+    else: # GET request
+        # Create a form instance pre-filled with the user's current profile data
+        form = ProfileForm(instance=profile)
+
+    # Render the edit profile template with the form
+    return render(request, 'circuits/edit_profile.html', {'form': form})
+
+
+def community_view(request):
+    """Displays a list of all registered users with their avatars."""
+    # Fetch users, optimize by prefetching related Profile using the correct related_name
+    # Order users alphabetically by username
+    users_list = User.objects.select_related('circuits_profile').all().order_by('username')
+
+    context = {
+        'users': users_list, # Pass the user list to the template
+    }
+    return render(request, 'circuits/community.html', context)
+
+
+def user_profile_view(request, username):
+    """Displays the profile page for a specific user, showing their posts."""
+    # Fetch the target user, optimize by prefetching related Profile
+    # Use get_object_or_404 to handle cases where the user doesn't exist
+    target_user = get_object_or_404(
+        User.objects.select_related('circuits_profile'),
+        username=username
+    )
+
+    # Fetch comments made by this user, optimize by prefetching related Circuit
+    user_comments = Comment.objects.filter(user=target_user).select_related('circuit').order_by('-created_at')
+
+    # Fetch lap times submitted by this user, optimize by prefetching related Circuit
+    user_lap_times = LapTimeEntry.objects.filter(user=target_user).select_related('circuit').order_by('circuit__name', 'lap_time')
+
+    # --- NEW: Get user's highest quiz score ---
+    highest_quiz_attempt = QuizAttempt.objects.filter(user=target_user).order_by('-score').first()
+    # If the user has attempts, get the score, otherwise set to None or a placeholder like 'N/A'
+    highest_score = highest_quiz_attempt.score if highest_quiz_attempt else None
+
+    context = {
+        'target_user': target_user,      # The user whose profile is being viewed
+        'comments': user_comments,       # List of comments by this user
+        'lap_times': user_lap_times,    # List of lap times by this user
+        'is_own_profile': request.user == target_user, # Add flag to check if viewing own profile
+        'highest_quiz_score': highest_score,
+    }
+    return render(request, 'circuits/user_profile.html', context)
+
+
+# --- NEW: Lap Time Update View ---
+class LapTimeUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """Allows the owner of a lap time entry to update it."""
+    model = LapTimeEntry
+    form_class = LapTimeForm # Reuse the form used for adding
+    template_name = 'circuits/laptime_form.html' # We need to create this template
+    context_object_name = 'laptime' # Optional: name in template context
 
     def get_success_url(self):
-        """
-        Determines the URL to redirect to after successful comment update.
-
-        Returns:
-            str: The URL for the detail page of the circuit the comment belongs to.
-        """
-        # Redirect back to the detail page of the circuit associated with this comment
-        return reverse_lazy(
-            'circuits:circuit_detail', args=[self.object.circuit.pk]
-        )
+        """Redirect to the circuit detail page after successful update."""
+        messages.success(self.request, 'Lap time updated successfully!')
+        # Redirect back to the detail page of the circuit this lap time belongs to
+        return reverse_lazy('circuits:circuit_detail', args=[self.object.circuit.pk])
 
     def test_func(self):
-        """
-        Checks if the currently logged-in user is the author of the comment.
-        This method is required by UserPassesTestMixin.
+        """Check if the current user is the owner of the lap time entry."""
+        laptime = self.get_object()
+        return self.request.user == laptime.user
 
-        Returns:
-            bool: True if the user is the author, False otherwise.
-        """
-        # Retrieve the comment object being accessed
-        comment = self.get_object() 
-        # Check if the request user matches the comment's author
-        return self.request.user == comment.user
-
-
-class CommentDeleteView(
-    LoginRequiredMixin,  # Ensures user is logged in
-    UserPassesTestMixin, # Ensures user owns the comment
-    DeleteView           # Provides generic deletion functionality
-):
-    """
-    Allows a logged-in user to delete their own existing comment.
-    Inherits from DeleteView for confirmation page and object deletion.
-    Uses mixins for access control.
-    """
-    model = Comment
-    template_name = 'circuits/comment_confirm_delete.html' # Confirmation page
+# --- NEW: Lap Time Delete View ---
+class LapTimeDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """Allows the owner of a lap time entry to delete it after confirmation."""
+    model = LapTimeEntry
+    template_name = 'circuits/laptime_confirm_delete.html' # We need to create this template
+    context_object_name = 'laptime' # Optional: name in template context
 
     def get_success_url(self):
-        """
-        Determines the URL to redirect to after successful comment deletion.
-
-        Returns:
-            str: The URL for the detail page of the circuit the comment belonged to.
-        """
-        # Redirect back to the detail page of the circuit associated with the deleted comment
-        # Note: self.object refers to the comment *before* it's deleted
-        return reverse_lazy(
-            'circuits:circuit_detail', args=[self.object.circuit.pk]
-        )
+        """Redirect to the circuit detail page after successful deletion."""
+        messages.success(self.request, 'Lap time deleted successfully!')
+        # Redirect back to the detail page of the circuit this lap time belonged to
+        return reverse_lazy('circuits:circuit_detail', args=[self.object.circuit.pk])
 
     def test_func(self):
-        """
-        Checks if the currently logged-in user is the author of the comment.
-        This method is required by UserPassesTestMixin.
+        """Check if the current user is the owner of the lap time entry."""
+        laptime = self.get_object()
+        return self.request.user == laptime.user
 
-        Returns:
-            bool: True if the user is the author, False otherwise.
-        """
-        # Retrieve the comment object being accessed
-        comment = self.get_object()
-        # Check if the request user matches the comment's author
-        return self.request.user == comment.user
+# ==============================================
+# Other/Test Views
+# ==============================================
+
+def test_map_view(request):
+    """Renders a standalone test map page (likely for development)."""
+    # Consider removing or securing this if not needed in production
+    return render(request, 'circuits/test_map.html')
+
+# --- End of views.py ---

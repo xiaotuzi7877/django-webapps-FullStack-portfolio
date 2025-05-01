@@ -382,7 +382,7 @@
   /* === Stats Grid === */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
     margin-bottom: 2rem;
   }
@@ -888,4 +888,104 @@ hr {
     margin-bottom: 2.5rem;
     border: 0;
     border-top: 1px solid #eee;
+}
+
+/* === Lap Time Form === */
+.lap-time-form {
+    /* Similar styles to comment-form */
+    background: var(--bg-light);
+    padding: 1.5rem;
+    /* Maybe a different border color? */
+    border-left: 5px solid #28a745; /* Example: Green border for lap times */
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: box-shadow var(--transition-speed) ease;
+}
+.lap-time-form:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+.lap-time-form label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 0.5rem; /* Adjusted margin */
+}
+.lap-time-form .form-select,
+.lap-time-form .form-control {
+    width: 100%;
+    /* Inherits general form styles, add specifics if needed */
+}
+.lap-time-form .form-select:focus,
+.lap-time-form .form-control:focus {
+    /* Inherits general form focus styles, override if needed */
+    border-color: #28a745; /* Example green focus */
+    box-shadow: 0 0 4px rgba(40, 167, 69, 0.3);
+}
+ .lap-time-form .form-text {
+    margin-top: 0.25rem;
+    color: var(--muted-color);
+    font-size: 0.875rem;
+}
+.lap-time-form .btn-submit-laptime {
+    margin-top: 1rem;
+    /* Style for the submit button, maybe green? */
+    background: #28a745;
+    border-color: #28a745;
+    color: #fff;
+    transition: background var(--transition-speed) ease,
+                transform var(--transition-speed) ease;
+}
+.lap-time-form .btn-submit-laptime:hover {
+    background: #218838;
+    transform: translateY(-2px);
+}
+
+/* === Lap Time Entry Card === */
+.lap-time-entry-card {
+    /* Similar styles to comment-card */
+    background: #fff;
+    border-radius: var(--border-radius);
+     /* Example: Green border */
+    border-left: 4px solid #28a745;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    margin-bottom: 1rem; /* Reduced margin slightly */
+    overflow: hidden;
+    transition: box-shadow var(--transition-speed) ease;
+}
+.lap-time-entry-card:hover {
+     box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+}
+.lap-time-entry-body {
+     padding: 0.8rem 1.2rem; /* Slightly adjusted padding */
+}
+ .lap-time-entry-body .meta {
+    font-size: 0.8rem; /* Smaller meta */
+    color: var(--muted-color);
+    margin-bottom: 0.3rem;
+}
+.lap-time-entry-body .meta strong {
+     color: var(--text-color);
+}
+.lap-time-entry-body .lap-time-value {
+    font-size: 1.2rem; /* Prominent lap time */
+    font-weight: 600;
+    color: #28a745; /* Green color for time */
+    margin-bottom: 0.2rem;
+}
+ .lap-time-entry-body .car-info {
+    font-size: 0.85rem;
+    color: var(--muted-color);
+    margin-bottom: 0.5rem;
+}
+ .lap-time-entry-body .actions {
+    /* Style actions if you add edit/delete */
+    text-align: right;
+    margin-top: 0.5rem;
+}
+
+/* Optional: Adjust layout containers if needed */
+.comments-lap-times-section h3,
+.comments-lap-times-section h4 {
+    /* Adjust heading styles if needed */
+    margin-bottom: 1rem;
 }

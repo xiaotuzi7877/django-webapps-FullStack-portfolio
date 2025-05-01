@@ -6,7 +6,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Comment
+from .models import Comment, LapTimeEntry, Profile
+
 
 class CommentForm(forms.ModelForm):
     """
@@ -56,3 +57,33 @@ class SignUpForm(UserCreationForm):
         model = User 
         # Specify the fields to include in the registration form
         fields = ['username', 'email', 'password1', 'password2']
+
+class LapTimeForm(forms.ModelForm):
+    class Meta:
+        model = LapTimeEntry
+        fields = ['car', 'lap_time'] 
+        widgets = {
+            'car': forms.Select(attrs={'class': 'form-select'}),
+            'lap_time': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g., 1:23.456'
+            }),
+        }
+
+class ProfileForm(forms.ModelForm):
+    """
+    Form for users to update their profile information, specifically the avatar.
+    """
+    class Meta:
+        model = Profile
+        fields = ['avatar'] 
+        widgets = {
+            
+            'avatar': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'avatar': 'Upload a new avatar', 
+        }
+        help_texts = {
+            'avatar': 'Select an image file for your profile picture.',
+        }

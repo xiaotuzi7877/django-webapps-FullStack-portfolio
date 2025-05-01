@@ -1,0 +1,60 @@
+{# circuits/templates/circuits/community.html #}
+
+{# Extend the base template #}
+{% extends "circuits/base.html" %}
+{% load static %}
+
+{# Set the page title #}
+{% block title %}Community - F1 Explorer{% endblock %}
+
+{# Start main content block #}
+{% block content %}
+
+<div class="container mt-4">
+  <h1 class="mb-4">Community Members</h1>
+
+  {# Check if there are any users to display #}
+  {% if users %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+      {# Loop through the list of users passed from the view #}
+      {% for user_profile in users %}
+        <div class="col">
+          <div class="card h-100 text-center shadow-sm">
+            {# Display User Avatar #}
+            {# Access avatar via the related_name 'circuits_profile' #}
+            <img src="{{ user_profile.circuits_profile.avatar.url }}"
+                 class="card-img-top rounded-circle p-3 mx-auto mt-3"
+                 alt="{{ user_profile.username }}'s avatar"
+                 style="width: 130px; height: 130px; object-fit: cover; border: 1px solid #eee;">
+
+            {# Display Username #}
+            <div class="card-body">
+              <h5 class="card-title mb-0">
+                {# Link username directly to the user's profile page #}
+                <a href="{% url 'circuits:user_profile' user_profile.username %}" class="text-decoration-none stretched-link">
+                    {{ user_profile.username }}
+                </a>
+              </h5>
+               {# Optional: Add registration date or other info if available/needed #}
+               {# <small class="text-muted">Joined: {{ user_profile.date_joined|date:"Y-m-d" }}</small> #}
+            </div>
+
+            {# Optional Footer with explicit button (alternative to stretched-link on title) #}
+            {# If you prefer an explicit button instead of linking the username: #}
+            {# Remove stretched-link from the username's <a> tag above #}
+            {# <div class="card-footer bg-light border-0 pt-0"> #}
+            {#  <a href="{% url 'circuits:user_profile' user_profile.username %}" class="btn btn-sm btn-outline-primary">View Profile</a> #}
+            {# </div> #}
+          </div> {# End card #}
+        </div> {# End column #}
+      {% endfor %}
+    </div> {# End row #}
+  {% else %}
+    {# Message displayed if no users are found #}
+    <p class="text-muted">No community members found yet.</p>
+  {% endif %}
+
+</div> {# End container #}
+
+{% endblock content %}
+{# End main content block #}

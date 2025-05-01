@@ -6,6 +6,13 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from django.db.models import Avg
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+import re
+from django.db.models.signals import post_save # Import signals
+from django.dispatch import receiver # Import receiver decorator
+
 
 # Defines choices for the continent field used in the Circuit model.
 CONTINENT_CHOICES = [
@@ -16,6 +23,19 @@ CONTINENT_CHOICES = [
     ('SA', 'South America'),
     ('OC', 'Oceania'),
     ('AN', 'Antarctica'),
+]
+
+F1_2024_CAR_CHOICES = [
+    ('Mercedes W15', 'Mercedes W15'),
+    ('Red Bull RB20', 'Red Bull RB20'),
+    ('Ferrari SF-24', 'Ferrari SF-24'),
+    ('McLaren MCL38', 'McLaren MCL38'),
+    ('Aston Martin AMR24', 'Aston Martin AMR24'),
+    ('Alpine A524', 'Alpine A524'),
+    ('Williams FW46', 'Williams FW46'),
+    ('RB VCARB 01', 'RB VCARB 01'),
+    ('Kick Sauber C44', 'Kick Sauber C44'),
+    ('Haas VF-24', 'Haas VF-24'),
 ]
 
 
@@ -79,6 +99,27 @@ class Circuit(models.Model):
         default='EU',
         help_text='Continent where the circuit is located'
     )
+    # --- NEW Fields for Most Wins ---
+    most_wins_driver = models.CharField(
+        max_length=100, 
+        blank=True, 
+        null=True, # Allow empty values if data unavailable
+        verbose_name="Most Wins Driver",
+        help_text="Name of the F1 driver with the most wins at this circuit."
+    )
+    most_wins_count = models.IntegerField(
+        blank=True, 
+        null=True, # Allow empty values
+        verbose_name="Most Wins Count",
+        help_text="Number of wins for the driver with the most wins."
+    )
+
+    def calculate_average_rating(self):
+        """Calculates the average rating from all comments for this circuit."""
+        # Use aggregate to calculate the average rating of related comments.
+        result = self.comments.aggregate(average=Avg('rating')) 
+        # The result is a dictionary {'average': avg_value} or {'average': None}
+        return result['average'] 
 
     def __str__(self):
         """Return the circuit name for display purposes."""
@@ -110,7 +151,32 @@ class Comment(models.Model):
         """Return a short summary of who commented on which circuit."""
         return f'{self.user.username} on {self.circuit.name}'
 
+def validate_lap_time_format(value):
+    pattern = re.compile(r'^(\d{1,2}:)?\d{2}\.\d{3}$')
+    if not pattern.match(value):
+        raise ValidationError('Invalid lap time format. Use MM:SS.mmm or SS.mmm')
 
+class LapTimeEntry(models.Model):
+    circuit = models.ForeignKey('Circuit', on_delete=models.CASCADE, related_name='lap_times')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='lap_times')
+    car = models.CharField(max_length=50, choices=F1_2024_CAR_CHOICES)
+    lap_time = models.CharField(
+        max_length=15,
+        validators=[validate_lap_time_format],
+        help_text="Enter lap time in MM:SS.mmm or SS.mmm format (e.g., 1:23.456 or 83.456)"
+    )
+    
+    # lap_time = models.DurationField(help_text="Enter lap time (e.g., 0:1:23.456)")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['lap_time'] 
+        # ordering = ['lap_time'] 
+        unique_together = [['circuit', 'user', 'car']]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.circuit.name} - {self.car}: {self.lap_time}"
+    
 class Question(models.Model):
     """Represents a quiz question."""
 
@@ -192,3 +258,20 @@ class Answer(models.Model):
         status = '✓' if self.is_correct else '✗'
         # Limit question text for brevity in admin or string representations
         return f'{self.attempt.user.username}: {self.question.text[:30]}... {status}'
+    
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='circuits_profile')
+    # MODIFIED: Upload avatars to 'media/user_avatars/'
+    avatar = models.ImageField(upload_to='user_avatars/', default='user_avatars/default.png')
+    # END MODIFIED
+
+    def __str__(self):
+        return f'{self.user.username} Profile'
+
+# Signal Receiver (no changes needed here)
+@receiver(post_save, sender=User)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+    instance.circuits_profile.save()
+

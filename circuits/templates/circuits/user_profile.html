@@ -1,0 +1,121 @@
+{# circuits/templates/circuits/user_profile.html #}
+
+{% extends "circuits/base.html" %}
+{% load static %}
+
+{% block title %}{{ target_user.username }}'s Profile - F1 Explorer{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+  {# --- User header section with avatar, username, high score, join date and edit button --- #}
+  <div class="row align-items-center mb-4">
+    <div class="col-md-2 text-center mb-3 mb-md-0">
+      <img
+        src="{{ target_user.circuits_profile.avatar.url }}"
+        class="img-thumbnail rounded-circle shadow-sm"
+        alt="{{ target_user.username }} avatar"
+        style="width: 150px; height: 150px; object-fit: cover;"
+      >
+    </div>
+    <div class="col-md-10">
+      <div class="d-flex align-items-center">
+        {# Username #}
+        <h1 class="display-5 mb-0 me-3">{{ target_user.username }}</h1>
+
+        {# Quiz High Score badge #}
+        {% if highest_quiz_score is not None %}
+          <span class="badge bg-success fs-5 p-2">
+            Quiz High Score: {{ highest_quiz_score }}
+          </span>
+        {% endif %}
+      </div>
+
+      {# Join date #}
+      <p class="text-muted mt-2 mb-2">
+        Member since: {{ target_user.date_joined|date:"F j, Y" }}
+      </p>
+
+      {# Edit Profile button, only if this is own profile #}
+      {% if is_own_profile %}
+        <a href="{% url 'circuits:edit_profile' %}" class="btn btn-secondary btn-sm">
+          Edit Profile
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <hr class="mb-4">
+
+  {# --- Two-column layout: Comments Posted / Lap Times Submitted --- #}
+  <div class="row">
+    {# Comments Posted Column #}
+    <div class="col-lg-6 mb-4 mb-lg-0">
+      <h2>Comments Posted</h2>
+      {% if comments %}
+        <div class="list-group shadow-sm">
+          {% for comment in comments %}
+            <div class="list-group-item list-group-item-action flex-column align-items-start mb-2 border rounded">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">
+                  On: <a href="{% url 'circuits:circuit_detail' comment.circuit.pk %}"
+                         class="text-decoration-none">{{ comment.circuit.name }}</a>
+                </h5>
+                <small class="text-muted">{{ comment.created_at|date:"Y-m-d H:i" }}</small>
+              </div>
+              <p class="mb-1">Rating: {{ comment.rating }} ★</p>
+              <p class="mb-1 fst-italic">"{{ comment.text }}"</p>
+              {% if comment.user == request.user %}
+                <div class="actions mt-1">
+                  <a href="{% url 'circuits:comment_update' comment.pk %}"
+                     class="btn btn-sm btn-outline-secondary py-0 px-1 me-1">Edit</a>
+                  <a href="{% url 'circuits:comment_delete' comment.pk %}"
+                     class="btn btn-sm btn-outline-danger py-0 px-1">Delete</a>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-light" role="alert">
+          {{ target_user.username }} hasn't posted any comments yet.
+        </div>
+      {% endif %}
+    </div>
+
+    {# Lap Times Submitted Column #}
+    <div class="col-lg-6">
+      <h2>Lap Times Submitted</h2>
+      {% if lap_times %}
+        <div class="list-group shadow-sm">
+          {% for entry in lap_times %}
+            <div class="list-group-item list-group-item-action flex-column align-items-start mb-2 border rounded">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">
+                  At: <a href="{% url 'circuits:circuit_detail' entry.circuit.pk %}"
+                         class="text-decoration-none">{{ entry.circuit.name }}</a>
+                </h5>
+                <small class="text-muted">{{ entry.created_at|date:"Y-m-d H:i" }}</small>
+              </div>
+              <p class="mb-1 fs-5"><strong>{{ entry.lap_time }}</strong></p>
+              <p class="mb-1 text-muted"><small>Car: {{ entry.car }}</small></p>
+              {% if entry.user == request.user %}
+                <div class="actions mt-2">
+                  <a href="{% url 'circuits:laptime_update' entry.pk %}"
+                     class="btn btn-sm btn-outline-secondary py-0 px-1 me-1">Edit</a>
+                  <a href="{% url 'circuits:laptime_delete' entry.pk %}"
+                     class="btn btn-sm btn-outline-danger py-0 px-1">Delete</a>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-light" role="alert">
+          {{ target_user.username }} hasn't submitted any lap times yet.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock content %}

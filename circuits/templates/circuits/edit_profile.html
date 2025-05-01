@@ -1,0 +1,73 @@
+{# circuits/templates/circuits/edit_profile.html #}
+
+{% extends "circuits/base.html" %} {# Inherit base structure #}
+{% load static %} {# Load static tag #}
+
+{% block title %}Edit Profile - F1 Explorer{% endblock %} {# Page title #}
+
+{% block content %} {# Start main content block #}
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+
+      <h1 class="mb-4 text-center">Edit Your Profile</h1>
+
+      {# Display current avatar preview #}
+      <div class="text-center mb-4">
+        {# Use the correct related name to access the avatar #}
+        <img src="{{ user.circuits_profile.avatar.url }}"
+             class="img-thumbnail rounded-circle shadow-sm"
+             alt="{{ user.username }}'s current avatar"
+             style="width: 150px; height: 150px; object-fit: cover;">
+         <p class="text-muted mt-2"><small>Current Avatar</small></p>
+      </div>
+
+      {# --- Form for uploading new avatar --- #}
+      {# IMPORTANT: enctype="multipart/form-data" is required for file uploads #}
+      <form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
+        {% csrf_token %} {# CSRF protection #}
+
+        {# Display the avatar field from the form #}
+        <div class="mb-3">
+            {# Use field properties for label and help text if defined in form #}
+            <label for="{{ form.avatar.id_for_label }}" class="form-label">
+                {% firstof form.avatar.label 'Upload/Change Avatar' %} {# Use form label or default #}
+            </label>
+
+            {{ form.avatar }} {# Render the ClearableFileInput widget #}
+
+            {% if form.avatar.help_text %}
+                <small class="form-text text-muted d-block">{{ form.avatar.help_text }}</small>
+            {% endif %}
+
+            {# Display any validation errors for the avatar field #}
+            {% if form.avatar.errors %}
+                <div class="text-danger mt-1">
+                    {% for error in form.avatar.errors %}
+                        <small>{{ error }}</small><br>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        {# If ProfileForm included other fields, display them here #}
+        {# Example: #}
+        {# <div class="mb-3"> #}
+        {#    <label for="{{ form.bio.id_for_label }}" class="form-label">{{ form.bio.label }}</label> #}
+        {#    {{ form.bio }} #}
+        {#    ... (help text and errors for bio) ... #}
+        {# </div> #}
+
+        {# Submit button and Cancel link #}
+        <div class="d-grid gap-2 mt-3">
+             <button type="submit" class="btn btn-primary">Save Changes</button>
+             {# Link back to the user's profile page #}
+             <a href="{% url 'circuits:user_profile' user.username %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form> {# End Form #}
+
+    </div> {# End column #}
+  </div> {# End row #}
+</div> {# End container #}
+{% endblock content %} 
+{# End main content block #}
