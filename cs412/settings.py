@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'restaurant',
     'mini_fb',
     #'voter_analytics',
-    'import_export',
+    #'import_export',
     'circuits',
 ]
 
