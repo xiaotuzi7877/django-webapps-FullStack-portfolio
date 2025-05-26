@@ -39,8 +39,14 @@ Temporory link to the website: https://cs-webapps.bu.edu/miclilzy/circuits/
 - **Interactive Map Interface**:  
   Browse all F1 circuits geographically without needing an account.
 
+  <img width="1511" alt="截屏2025-05-26 下午4 38 00" src="https://github.com/user-attachments/assets/bb29ce47-fbd9-4826-9d75-098f242e7593" />
+
+
 - **Detailed Circuit Profiles**:  
   View track layouts, historical statistics, fun facts, and technical specifications.
+
+  <img width="1511" alt="截屏2025-05-26 下午4 38 07" src="https://github.com/user-attachments/assets/37574bb5-f3ff-4fde-8bc4-50d5faf06dd0" />
+
 
 - **Smart Search**:  
   Filter circuits by name or geographical region.
@@ -58,6 +64,10 @@ Temporory link to the website: https://cs-webapps.bu.edu/miclilzy/circuits/
 - **Dynamic Leaderboards**:  
   See how your quiz scores stack up against the community.
 
+  <img width="1512" alt="截屏2025-05-26 下午4 46 39" src="https://github.com/user-attachments/assets/abeb0393-46e5-41f2-97b3-f98eefb110f3" />
+
+
+
 ---
 
 ### Gamification Elements
@@ -71,6 +81,9 @@ Temporory link to the website: https://cs-webapps.bu.edu/miclilzy/circuits/
 ---
 
 ### User Management
+
+<img width="1512" alt="截屏2025-05-26 下午4 44 28" src="https://github.com/user-attachments/assets/dca69e08-a3b3-4e14-b063-ab8eef2ca0a2" />
+
 
 - **Secure Authentication**:  
   Create accounts and manage profiles.
